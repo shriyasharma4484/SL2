@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sevadeep CivicConnect 🌿🤝
 ### Community Issue Reporting & Grassroots Resolution Platform
 **Customized for Sevadeep NGO, Pune, Maharashtra, India**  
@@ -144,3 +145,6 @@ CLIENT_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 *(An accompanying `server/.env.example` is also provided in the repository)*.
+=======
+# SL2
+>>>>>>> 7a85ce6f36de7fea990f3113f2422d8d877d4d42
