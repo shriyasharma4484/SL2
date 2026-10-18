@@ -26,7 +26,14 @@ export default function AdminActivitiesPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedEventForAttendance, setSelectedEventForAttendance] = useState(null);
+  const [selectedEventForCompletion, setSelectedEventForCompletion] = useState(null);
   const [participants, setParticipants] = useState([]);
+
+  // Completion Metrics State
+  const [completionSummary, setCompletionSummary] = useState('');
+  const [wasteCollectedKg, setWasteCollectedKg] = useState(150);
+  const [treesPlanted, setTreesPlanted] = useState(0);
+  const [submittingCompletion, setSubmittingCompletion] = useState(false);
 
   // New Event Form State
   const [title, setTitle] = useState('');
@@ -55,6 +62,31 @@ export default function AdminActivitiesPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCompleteEventSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedEventForCompletion) return;
+    setSubmittingCompletion(true);
+    try {
+      const formData = new FormData();
+      formData.append('status', 'Completed');
+      formData.append('completion_summary', completionSummary.trim());
+      formData.append('waste_collected_kg', wasteCollectedKg);
+      formData.append('trees_planted', treesPlanted);
+
+      const res = await eventService.updateEvent(selectedEventForCompletion.id, formData);
+      if (res.data.success) {
+        alert('Event successfully marked as Completed and added to Social Impact metrics!');
+        setSelectedEventForCompletion(null);
+        setCompletionSummary('');
+        loadEvents();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to complete event.');
+    } finally {
+      setSubmittingCompletion(false);
     }
   };
 
@@ -188,7 +220,7 @@ export default function AdminActivitiesPage() {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => handleOpenAttendance(ev)}
@@ -197,9 +229,23 @@ export default function AdminActivitiesPage() {
                   Roster & Attendance
                 </button>
 
-                <span className="text-[11px] text-slate-400">
-                  {ev.status}
-                </span>
+                {ev.status === 'Upcoming' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedEventForCompletion(ev);
+                      setCompletionSummary(`Successfully conducted community drive at ${ev.location_name}.`);
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-1 shadow-2xs"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Mark Completed</span>
+                  </button>
+                ) : (
+                  <span className="text-[11px] font-bold text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded">
+                    ✓ Completed & Logged
+                  </span>
+                )}
               </div>
             </div>
           ))}
@@ -419,6 +465,94 @@ export default function AdminActivitiesPage() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Complete Activity & Log Impact Modal */}
+      {selectedEventForCompletion && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900">
+                  Record Drive Completion & Impact Metrics
+                </h3>
+                <p className="text-xs text-slate-500">{selectedEventForCompletion.title}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedEventForCompletion(null)}
+                className="text-slate-400 hover:text-slate-600 text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCompleteEventSubmit} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Waste Collected (kg)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    value={wasteCollectedKg}
+                    onChange={(e) => setWasteCollectedKg(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-slate-300 outline-hidden"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Diverted to PMC recycling</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                    Native Trees Planted
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={treesPlanted}
+                    onChange={(e) => setTreesPlanted(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-slate-300 outline-hidden"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Saplings planted on hill slope</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Completion Summary & Verified Outcome
+                </label>
+                <textarea
+                  rows="3"
+                  required
+                  value={completionSummary}
+                  onChange={(e) => setCompletionSummary(e.target.value)}
+                  placeholder="Detail the community outcome (e.g. 35 volunteers cleared 180kg plastic along Mutha riverbed...)"
+                  className="w-full text-xs p-3 rounded-xl border border-slate-300 outline-hidden"
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEventForCompletion(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingCompletion}
+                  className="px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold flex items-center gap-1.5"
+                >
+                  {submittingCompletion ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                  <span>Save Outcome & Mark Completed</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
