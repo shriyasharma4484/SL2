@@ -581,8 +581,111 @@ export default function IssueDetailPage() {
           </div>
         </div>
 
-        {/* Right Column (4 cols): Location Map, Status History Timeline, Coordinator Controls */}
+        {/* Right Column (4 cols): Coordinator Controls (Top), Location Map, Status History Timeline */}
         <div className="lg:col-span-4 space-y-6">
+          {/* Coordinator Action Panel (Positioned Prominently at the TOP for immediate access) */}
+          {isCoordinator && (
+            <div className="bg-emerald-950 text-white rounded-3xl p-6 shadow-xl space-y-4 border-2 border-emerald-500/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs uppercase tracking-wider">
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                  <span>Coordinator Decision Panel</span>
+                </div>
+                <span className="text-[10px] bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded font-bold uppercase">
+                  Staff Action
+                </span>
+              </div>
+
+              <form onSubmit={handleCoordinatorStatusUpdate} className="space-y-3.5 text-xs">
+                <div>
+                  <label className="block text-xs font-bold text-emerald-200 mb-1">
+                    Update Workflow Status:
+                  </label>
+                  <select
+                    value={coordinatorStatus}
+                    onChange={(e) => setCoordinatorStatus(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-emerald-900 border border-emerald-700 text-white font-semibold text-xs outline-hidden focus:ring-2 focus:ring-emerald-400"
+                  >
+                    <option value="Submitted">Submitted (Pending Review)</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Approved">Approved (Public on Map)</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved (Outcome Verified) ✅</option>
+                    <option value="Needs More Information">Needs More Information</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-emerald-200 mb-1">
+                    Assign Volunteer (Optional):
+                  </label>
+                  <select
+                    value={assignVolunteerId}
+                    onChange={(e) => setAssignVolunteerId(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-emerald-900 border border-emerald-700 text-white outline-hidden text-xs"
+                  >
+                    <option value="">-- Select Volunteer --</option>
+                    {volunteersList.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name} ({v.area} - {v.points} pts)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-emerald-200 mb-1">
+                    Municipal / PMC Referral Note (Optional):
+                  </label>
+                  <input
+                    type="text"
+                    value={referralStatus}
+                    onChange={(e) => setReferralStatus(e.target.value)}
+                    placeholder="e.g. Docket #PMC-WTR-8821 with Ward 7"
+                    className="w-full p-2 rounded-xl bg-emerald-900 border border-emerald-700 text-white outline-hidden text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-emerald-200 mb-1">
+                    Coordinator Resolution / Progress Notes:
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={coordinatorNotes}
+                    onChange={(e) => setCoordinatorNotes(e.target.value)}
+                    placeholder="Provide notes on action taken or verification findings..."
+                    className="w-full p-2.5 rounded-xl bg-emerald-900 border border-emerald-700 text-white outline-hidden text-xs"
+                  ></textarea>
+                </div>
+
+                {coordinatorStatus === 'Resolved' && (
+                  <div className="p-3 bg-emerald-900/80 rounded-xl border border-emerald-700/80 space-y-1.5">
+                    <label className="block text-[11px] font-bold text-emerald-300">
+                      Upload Verified "After" Photo Proof:
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setResolutionPhoto(e.target.files[0] || null)}
+                      className="text-xs text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-700 file:text-white"
+                    />
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={updatingCoordinator}
+                  className="w-full py-3 px-4 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold rounded-xl shadow-md transition-colors flex items-center justify-center gap-2 text-xs"
+                >
+                  {updatingCoordinator ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  <span>Save Status & Notify Reporter</span>
+                </button>
+              </form>
+            </div>
+          )}
+
           {/* Location Map Card */}
           <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs space-y-3">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
@@ -634,104 +737,6 @@ export default function IssueDetailPage() {
               ))}
             </div>
           </div>
-
-          {/* Coordinator Action Panel (Only if logged in as Coordinator) */}
-          {isCoordinator && (
-            <div className="bg-emerald-950 text-white rounded-3xl p-6 shadow-xl space-y-4 border border-emerald-800">
-              <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs uppercase tracking-wider">
-                <Shield className="w-4 h-4 text-emerald-400" />
-                <span>Coordinator Administration Panel</span>
-              </div>
-
-              <form onSubmit={handleCoordinatorStatusUpdate} className="space-y-3 text-xs">
-                <div>
-                  <label className="block text-[11px] text-emerald-200 mb-1">
-                    Update Workflow Status:
-                  </label>
-                  <select
-                    value={coordinatorStatus}
-                    onChange={(e) => setCoordinatorStatus(e.target.value)}
-                    className="w-full p-2.5 rounded-lg bg-emerald-900 border border-emerald-700 text-white outline-hidden"
-                  >
-                    <option value="Submitted">Submitted (Pending Review)</option>
-                    <option value="Under Review">Under Review</option>
-                    <option value="Approved">Approved (Public on Map)</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved (Outcome Verified)</option>
-                    <option value="Needs More Information">Needs More Information</option>
-                    <option value="Rejected">Rejected</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-emerald-200 mb-1">
-                    Assign Volunteer:
-                  </label>
-                  <select
-                    value={assignVolunteerId}
-                    onChange={(e) => setAssignVolunteerId(e.target.value)}
-                    className="w-full p-2.5 rounded-lg bg-emerald-900 border border-emerald-700 text-white outline-hidden"
-                  >
-                    <option value="">-- Select Volunteer --</option>
-                    {volunteersList.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.name} ({v.area} - {v.points} pts)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-emerald-200 mb-1">
-                    Municipal / PMC Referral Note:
-                  </label>
-                  <input
-                    type="text"
-                    value={referralStatus}
-                    onChange={(e) => setReferralStatus(e.target.value)}
-                    placeholder="e.g. Docket #PMC-WTR-8821 with Ward 7"
-                    className="w-full p-2 rounded-lg bg-emerald-900 border border-emerald-700 text-white outline-hidden text-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-emerald-200 mb-1">
-                    Coordinator Progress / Resolution Notes:
-                  </label>
-                  <textarea
-                    rows="3"
-                    value={coordinatorNotes}
-                    onChange={(e) => setCoordinatorNotes(e.target.value)}
-                    placeholder="Provide notes on action taken or verification findings..."
-                    className="w-full p-2 rounded-lg bg-emerald-900 border border-emerald-700 text-white outline-hidden text-xs"
-                  ></textarea>
-                </div>
-
-                {coordinatorStatus === 'Resolved' && (
-                  <div>
-                    <label className="block text-[11px] text-emerald-200 mb-1">
-                      Upload Resolution Photo:
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setResolutionPhoto(e.target.files[0] || null)}
-                      className="text-xs text-slate-300"
-                    />
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={updatingCoordinator}
-                  className="w-full py-2.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5"
-                >
-                  {updatingCoordinator ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  <span>Save Status & Notify Reporter</span>
-                </button>
-              </form>
-            </div>
-          )}
         </div>
       </div>
     </div>
