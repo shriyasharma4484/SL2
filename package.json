@@ -1,0 +1,23 @@
+{
+  "name": "sevadeep-civicconnect",
+  "version": "1.0.0",
+  "description": "Community Issue Reporting & Engagement Platform for Sevadeep NGO, Pune",
+  "scripts": {
+    "dev": "node start-dev.js",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "seed": "cd server && node schema/initDb.js"
+  },
+  "keywords": [
+    "sevadeep",
+    "civic-tech",
+    "community-reporting",
+    "ngo",
+    "pune",
+    "civic-seva",
+    "volunteering"
+  ],
+  "author": "Sevadeep NGO & CivicSeva Team",
+  "license": "ISC"
+}
