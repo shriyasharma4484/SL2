@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { issueService } from '../services/api';
@@ -13,7 +13,8 @@ import {
   Info,
   Calendar,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Compass
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -26,6 +27,19 @@ const CATEGORIES = [
 ];
 
 const SEVERITIES = ['Low', 'Medium', 'High', 'Critical'];
+
+// Haversine distance calculator between two coordinates in meters
+function getDistanceMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const toRad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * toRad;
+  const dLon = (lon2 - lon1) * toRad;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
 
 export default function ReportIssuePage() {
   const { user, isAuthenticated } = useAuth();
@@ -47,6 +61,58 @@ export default function ReportIssuePage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [submissionSuccess, setSubmissionSuccess] = useState(null);
+
+  // Proximity duplicate detection state
+  const [existingIssues, setExistingIssues] = useState([]);
+  const [nearbyDuplicate, setNearbyDuplicate] = useState(null);
+
+  useEffect(() => {
+    // Load existing active public issues to detect nearby duplicates
+    const fetchExisting = async () => {
+      try {
+        const res = await issueService.getPublicIssues({ limit: 100 });
+        if (res.data?.success && res.data.issues) {
+          setExistingIssues(res.data.issues);
+        }
+      } catch (e) {
+        console.error('Failed to load existing issues for proximity check:', e);
+      }
+    };
+    fetchExisting();
+  }, []);
+
+  // Check for nearby duplicates whenever coordinates change
+  useEffect(() => {
+    if (!existingIssues.length || !formData.latitude || !formData.longitude) return;
+
+    let closest = null;
+    let minDistance = Infinity;
+
+    for (const issue of existingIssues) {
+      if (issue.latitude && issue.longitude) {
+        const dist = getDistanceMeters(
+          formData.latitude,
+          formData.longitude,
+          parseFloat(issue.latitude),
+          parseFloat(issue.longitude)
+        );
+        // Alert if within 100 meters
+        if (dist <= 100 && dist < minDistance) {
+          minDistance = dist;
+          closest = {
+            id: issue.id,
+            title: issue.title,
+            reference_no: issue.reference_no,
+            category: issue.category,
+            location_address: issue.location_address,
+            distance: dist
+          };
+        }
+      }
+    }
+
+    setNearbyDuplicate(closest);
+  }, [formData.latitude, formData.longitude, existingIssues]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -399,6 +465,39 @@ export default function ReportIssuePage() {
               />
             </div>
           </div>
+
+          {/* Proximity Duplicate Warning Alert */}
+          {nearbyDuplicate && (
+            <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-2 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-extrabold text-xs text-amber-900">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <span>Possible Duplicate Detected within ~{nearbyDuplicate.distance} meters!</span>
+                </div>
+                <span className="text-[10px] font-mono bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded font-bold">
+                  {nearbyDuplicate.reference_no}
+                </span>
+              </div>
+
+              <p className="text-xs text-amber-900/90 leading-relaxed">
+                A neighbor has already reported: <strong>"{nearbyDuplicate.title}"</strong> ({nearbyDuplicate.category}) at {nearbyDuplicate.location_address}.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <Link
+                  to={`/issues/${nearbyDuplicate.id}`}
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-white hover:bg-emerald-50 border border-emerald-300 px-3.5 py-1.5 rounded-xl shadow-2xs transition-colors"
+                >
+                  <span>View &amp; Support Existing Report Instead</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <span className="text-[11px] text-amber-800 font-medium">
+                  Supporting an existing issue consolidates neighborhood upvotes!
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Date and Time Note */}

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { issueService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import CategoryBadge from '../components/CategoryBadge';
+import VolunteerCertificateModal from '../components/VolunteerCertificateModal';
 import {
   CheckCircle2,
   Clock,
@@ -15,13 +16,15 @@ import {
   ArrowRight,
   Send,
   Loader2,
-  Sparkles
+  Sparkles,
+  FileCheck
 } from 'lucide-react';
 
 export default function VolunteerDashboardPage() {
   const { user } = useAuth();
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCertModal, setShowCertModal] = useState(false);
 
   // Modal / submission state for volunteer progress
   const [selectedTask, setSelectedTask] = useState(null);
@@ -92,15 +95,26 @@ export default function VolunteerDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 flex-shrink-0">
-          <div className="bg-white/10 border border-white/20 p-4 rounded-2xl text-center backdrop-blur-sm">
-            <div className="text-2xl font-extrabold text-emerald-300">{user?.points || 75}</div>
-            <p className="text-[11px] text-slate-300 font-semibold">Impact Points</p>
+        <div className="flex flex-col sm:flex-row items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/10 border border-white/20 p-4 rounded-2xl text-center backdrop-blur-sm">
+              <div className="text-2xl font-extrabold text-emerald-300">{user?.points || 75}</div>
+              <p className="text-[11px] text-slate-300 font-semibold">Impact Points</p>
+            </div>
+            <div className="bg-white/10 border border-white/20 p-4 rounded-2xl text-center backdrop-blur-sm">
+              <div className="text-2xl font-extrabold text-teal-300">{assignments.length}</div>
+              <p className="text-[11px] text-slate-300 font-semibold">Assigned Tasks</p>
+            </div>
           </div>
-          <div className="bg-white/10 border border-white/20 p-4 rounded-2xl text-center backdrop-blur-sm">
-            <div className="text-2xl font-extrabold text-teal-300">{assignments.length}</div>
-            <p className="text-[11px] text-slate-300 font-semibold">Assigned Tasks</p>
-          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowCertModal(true)}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          >
+            <Award className="w-4 h-4 text-emerald-950" />
+            <span>Generate Official Certificate</span>
+          </button>
         </div>
       </div>
 
@@ -298,6 +312,13 @@ export default function VolunteerDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Official Volunteer Service Credential Modal */}
+      <VolunteerCertificateModal
+        user={user}
+        isOpen={showCertModal}
+        onClose={() => setShowCertModal(false)}
+      />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import StatusBadge from '../components/StatusBadge';
 import CategoryBadge from '../components/CategoryBadge';
 import SeverityBadge from '../components/SeverityBadge';
 import LeafletMap from '../components/LeafletMap';
+import BeforeAfterSlider from '../components/BeforeAfterSlider';
+import PmcEscalationModal from '../components/PmcEscalationModal';
 import {
   ThumbsUp,
   MessageSquare,
@@ -23,7 +25,10 @@ import {
   Check,
   ArrowLeft,
   Loader2,
-  Building
+  Building,
+  Share2,
+  Copy,
+  FileText
 } from 'lucide-react';
 
 export default function IssueDetailPage() {
@@ -34,6 +39,10 @@ export default function IssueDetailPage() {
   const [issue, setIssue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Escalation and share states
+  const [showEscalationModal, setShowEscalationModal] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   // Confirmation state
   const [confirming, setConfirming] = useState(false);
@@ -277,11 +286,26 @@ export default function IssueDetailPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <CategoryBadge category={issue.category} />
                 <SeverityBadge severity={issue.severity} />
-                {issue.municipal_referral_status && (
-                  <span className="text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <Building className="w-3.5 h-3.5" />
+                {issue.municipal_referral_status ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowEscalationModal(true)}
+                    className="text-xs font-semibold bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                    title="Click to view official PMC Ward Escalation Notice under Maharashtra RTS Act"
+                  >
+                    <Building className="w-3.5 h-3.5 text-sky-600" />
                     <span>{issue.municipal_referral_status}</span>
-                  </span>
+                    <span className="text-[10px] bg-sky-200 text-sky-900 px-1 rounded font-bold">RTS SLA</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowEscalationModal(true)}
+                    className="text-xs font-medium text-slate-600 hover:text-sky-800 bg-slate-100 hover:bg-sky-50 border border-slate-200 px-2.5 py-0.5 rounded-full flex items-center gap-1 transition-colors"
+                  >
+                    <FileText className="w-3 h-3 text-slate-400" />
+                    <span>PMC Ward Notice Draft</span>
+                  </button>
                 )}
               </div>
 
@@ -342,23 +366,40 @@ export default function IssueDetailPage() {
               </p>
             </div>
 
-            {/* Coordinator Resolution Notes (if resolved) */}
+            {/* Coordinator Resolution Notes & Before/After Slider (if resolved) */}
             {issue.status === 'Resolved' && (
-              <div className="p-5 rounded-2xl bg-teal-50 border border-teal-200 space-y-3">
+              <div className="p-5 rounded-2xl bg-teal-50 border border-teal-200 space-y-4">
                 <div className="flex items-center gap-2 text-teal-900 font-bold text-sm">
                   <CheckCircle2 className="w-5 h-5 text-teal-700" />
-                  <span>Verified Outcome & Resolution Summary</span>
+                  <span>Verified Outcome &amp; Resolution Summary</span>
                 </div>
                 <p className="text-xs text-teal-950 leading-relaxed">
                   {issue.resolution_notes || 'Cleanup and remediation verified on-site by Sevadeep coordinator and neighborhood volunteer teams.'}
                 </p>
+
+                {/* Interactive Before & After Slider */}
                 {issue.resolution_photo && (
                   <div className="pt-2">
-                    <img
-                      src={issue.resolution_photo}
-                      alt="Verified Resolution"
-                      className="rounded-xl h-48 w-full sm:w-80 object-cover border border-teal-300"
-                    />
+                    {(() => {
+                      const beforePhoto = issue.photographs?.find((p) => p.photo_type === 'initial' || p.photo_type === 'evidence')?.photo_url || issue.photographs?.[0]?.photo_url;
+                      if (beforePhoto) {
+                        return (
+                          <BeforeAfterSlider
+                            beforeUrl={beforePhoto}
+                            afterUrl={issue.resolution_photo}
+                            beforeLabel="Initial Problem"
+                            afterLabel="Resolved Site"
+                          />
+                        );
+                      }
+                      return (
+                        <img
+                          src={issue.resolution_photo}
+                          alt="Verified Resolution"
+                          className="rounded-xl h-48 w-full sm:w-80 object-cover border border-teal-300"
+                        />
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -388,6 +429,38 @@ export default function IssueDetailPage() {
 
               <div className="text-[11px] text-slate-400">
                 Duplicate confirmations prevented per account
+              </div>
+            </div>
+
+            {/* WhatsApp Community Mobilization Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 bg-slate-50/70 -mx-6 -mb-6 p-4 rounded-b-3xl">
+              <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
+                <Share2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>Mobilize your neighborhood for this issue:</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                    `🚨 Civic Issue Alert (Pune): "${issue.title}" at ${issue.location_address}. Please confirm and support this report on Sevadeep CivicConnect so PMC/Sevadeep prioritizes action: ${window.location.href}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs transition-colors"
+                >
+                  <span>💬 Share on WhatsApp</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 2000);
+                  }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-white text-slate-700 text-xs font-semibold transition-colors"
+                >
+                  {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{linkCopied ? 'Link Copied!' : 'Copy Link'}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -739,6 +812,13 @@ export default function IssueDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Official PMC Ward Escalation Notice Modal */}
+      <PmcEscalationModal
+        issue={issue}
+        isOpen={showEscalationModal}
+        onClose={() => setShowEscalationModal(false)}
+      />
     </div>
   );
 }
