@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { impactService } from '../services/api';
 import CategoryBadge from '../components/CategoryBadge';
+import CsrImpactBriefModal from '../components/CsrImpactBriefModal';
 import {
   CheckCircle2,
   Calendar,
@@ -14,12 +15,14 @@ import {
   MapPin,
   ExternalLink,
   Info,
-  Scale
+  Scale,
+  FileText
 } from 'lucide-react';
 
 export default function ImpactPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCsrModal, setShowCsrModal] = useState(false);
 
   useEffect(() => {
     async function loadStats() {
@@ -46,14 +49,26 @@ export default function ImpactPage() {
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-          Transparency & Measurable Results
+          Transparency &amp; Measurable Results
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Social Impact & Public Accountability
+          Social Impact &amp; Public Accountability
         </h1>
         <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
           Sevadeep NGO believes in complete civic transparency. Here you can inspect verified outcomes, before-and-after physical evidence, and our municipal escalation bridge with Pune Municipal Corporation (PMC).
         </p>
+
+        {/* CSR Impact Brief Export Button */}
+        <div className="pt-2 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowCsrModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
+          >
+            <FileText className="w-4 h-4 text-emerald-200" />
+            <span>Download Official CSR &amp; Donor Impact Brief (PDF)</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -241,6 +256,13 @@ export default function ImpactPage() {
           </table>
         </div>
       </div>
+
+      {/* Official CSR & Donor Impact Brief Modal */}
+      <CsrImpactBriefModal
+        stats={stats}
+        isOpen={showCsrModal}
+        onClose={() => setShowCsrModal(false)}
+      />
     </div>
   );
 }

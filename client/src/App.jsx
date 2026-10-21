@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 // Components
 import DemoBanner from './components/DemoBanner';
@@ -49,7 +50,8 @@ export default function App() {
   return (
     <AuthProvider>
       <NotificationProvider>
-        <Router>
+        <LanguageProvider>
+          <Router>
           <Routes>
             {/* Public Community Routes */}
             <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
@@ -82,7 +84,8 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
-      </NotificationProvider>
-    </AuthProvider>
+      </LanguageProvider>
+    </NotificationProvider>
+  </AuthProvider>
   );
 }

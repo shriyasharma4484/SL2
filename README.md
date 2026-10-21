@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Sevadeep CivicConnect 🌿🤝
 ### Community Issue Reporting & Grassroots Resolution Platform
 **Customized for Sevadeep NGO, Pune, Maharashtra, India**  
@@ -33,7 +32,22 @@ Database (MySQL Server 8.0 on localhost:3306 - Database: sevadeep_civicconnect)
 
 ---
 
-## 2. Seeded Demonstration Personas
+## 2. Distinctive Platform Innovations
+
+| Innovation | Implementation | Real-World Impact |
+|---|---|---|
+| **Bilingual Language Switcher** | `LanguageContext.jsx` & Navbar switch | Instant toggle between **English ⇄ मराठी** for Pune citizens and ground workers. |
+| **Interactive Before & After Slider** | `BeforeAfterSlider.jsx` | Drag split-screen slider on resolved tickets to verify on-site cleanup proof. |
+| **Chronic Black-Spot Hotspot Layer** | `LeafletMap.jsx` spatial clustering | Pulsing crimson dashed circles on map highlighting recurring waste dumping zones (<250m). |
+| **Proximity Duplicate Alert** | Haversine formula in `ReportIssuePage.jsx` | Warns if an open issue exists within 100m of dropped pin to prevent duplicate tickets. |
+| **PMC RTS SLA Watchdog & Legal Notice** | `PmcEscalationModal.jsx` | Statutory SLA tracker under Maharashtra RTS Act 2015; generates print-ready legal notices for Ward Officers. |
+| **Verifiable Volunteer Certificate** | `VolunteerCertificateModal.jsx` | Print/PDF credential recognizing verified volunteer hours for college credits & CSR appraisals. |
+| **Official CSR & Donor Impact Brief** | `CsrImpactBriefModal.jsx` | 1-click executive disclosure PDF aligned with UN SDG 11 & SDG 12 for donors and sponsors. |
+| **WhatsApp Community Mobilization** | 1-click share in `IssueDetailPage.jsx` | Direct WhatsApp sharing to society/neighborhood groups to rally upvotes. |
+
+---
+
+## 3. Seeded Demonstration Personas
 
 The platform includes a **1-Click Quick Demo Switcher** directly in the top header and login page for instantaneous evaluator testing:
 
@@ -48,7 +62,7 @@ The platform includes a **1-Click Quick Demo Switcher** directly in the top head
 
 ---
 
-## 3. Database Schema (11 Relational Tables)
+## 4. Database Schema (11 Relational Tables)
 
 1. `users`: Stores citizen, volunteer, and coordinator profiles, bcrypt password hashes, contact details, Pune neighborhood, points, and active status.
 2. `reports`: Core community reports with unique reference codes (`SVD-2026-XXXX`), coordinates (`latitude`, `longitude`), Pune street address, category, severity, status, coordinator notes, and municipal referral docket.
@@ -64,7 +78,7 @@ The platform includes a **1-Click Quick Demo Switcher** directly in the top head
 
 ---
 
-## 4. Key Functional Workflows
+## 5. Key Functional Workflows
 
 ### A. Community Issue Reporting & Privacy
 - Residents pick an exact problem spot in Pune on Leaflet OpenStreetMap or click **"Use My Current Location"**.
@@ -87,12 +101,12 @@ Submitted ──> Under Review ──> Approved ──> In Progress ──> Reso
 
 ---
 
-## 5. Local Setup & Running Instructions
+## 6. Local Setup & Running Instructions
 
 ### Prerequisites
-- Node.js v18+ (verified on Node.js v24.21.0)
+- Node.js v18+ (tested on Node.js v20/v24)
 - npm v10+
-- MySQL Server 8.0 running on localhost:3306
+- MySQL Server 8.0 running on `localhost:3306` (or use seed dataset)
 
 ### Quick Launch (Concurrent Full-Stack)
 From the project root:
@@ -127,7 +141,7 @@ Open your browser to `http://localhost:5173`.
 
 ---
 
-## 6. Environment Configuration
+## 7. Environment Configuration
 
 ### Backend (`server/.env`)
 ```env
@@ -145,6 +159,3 @@ CLIENT_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 *(An accompanying `server/.env.example` is also provided in the repository)*.
-=======
-# SL2
->>>>>>> 7a85ce6f36de7fea990f3113f2422d8d877d4d42

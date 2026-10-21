@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import NotificationDropdown from './NotificationDropdown';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Menu,
   X,
@@ -17,12 +18,14 @@ import {
   LogOut,
   Shield,
   Layers,
-  ChevronDown
+  ChevronDown,
+  Languages
 } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout, isCoordinator, isVolunteer } = useAuth();
   const { unreadCount } = useNotifications();
+  const { lang, toggleLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -47,10 +50,10 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Community Issues', path: '/issues', icon: MapPin },
-    { name: 'Volunteer Activities', path: '/activities', icon: Calendar },
-    { name: 'Social Impact', path: '/impact', icon: BarChart3 },
+    { name: t('home'), path: '/' },
+    { name: t('issues'), path: '/issues', icon: MapPin },
+    { name: t('activities'), path: '/activities', icon: Calendar },
+    { name: t('impact'), path: '/impact', icon: BarChart3 },
     { name: 'About Sevadeep', path: '/about', icon: Info },
     { name: 'Contact', path: '/contact', icon: PhoneCall },
   ];
@@ -117,13 +120,24 @@ export default function Navbar() {
 
           {/* Actions & Profile Area */}
           <div className="hidden sm:flex items-center gap-3">
+            {/* Language Switcher Pill */}
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-600 bg-slate-50 hover:bg-emerald-50 text-xs font-bold text-slate-700 hover:text-emerald-800 transition-colors cursor-pointer shadow-2xs"
+              title={lang === 'en' ? 'मराठी भाषेत वापरा' : 'Switch to English'}
+            >
+              <Languages className="w-3.5 h-3.5 text-emerald-600" />
+              <span>{lang === 'en' ? 'मराठी' : 'English'}</span>
+            </button>
+
             {/* Primary Action Button: Report an Issue */}
             <Link
               to="/report"
               className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3.5 py-2.5 rounded-lg shadow-sm hover:shadow transition-all"
             >
               <PlusCircle className="w-4 h-4 text-emerald-200" />
-              <span>Report an Issue</span>
+              <span>{t('reportIssue')}</span>
             </Link>
 
             {/* Notification Bell (if logged in) */}
@@ -279,6 +293,22 @@ export default function Navbar() {
               </Link>
             ))}
           </nav>
+
+          <div className="pt-2 pb-1">
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800"
+            >
+              <span className="flex items-center gap-2">
+                <Languages className="w-4 h-4 text-emerald-600" />
+                <span>भाषा बदला / Change Language</span>
+              </span>
+              <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-bold">
+                {lang === 'en' ? 'मराठी' : 'English'}
+              </span>
+            </button>
+          </div>
 
           <div className="border-t border-slate-100 pt-3">
             {user ? (
