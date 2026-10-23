@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sevadeep CivicConnect - Entity Relationship Diagram</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0b1120;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      width: 2900px;
+      height: 1950px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Grid background */
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+    
+    /* Header Bar */
+    .header {
+      position: absolute;
+      top: 30px;
+      left: 60px;
+      right: 60px;
+      height: 90px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+    }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .logo-badge {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #059669, #047857);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+    }
+    .header-title h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-title p {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-mysql { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-ngo { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    
+    .header-stats {
+      display: flex;
+      gap: 28px;
+    }
+    .stat-item { text-align: right; }
+    .stat-val { font-size: 20px; font-weight: 800; color: #38bdf8; }
+    .stat-lbl { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
+
+    /* Legend */
+    .legend {
+      position: absolute;
+      bottom: 30px;
+      left: 60px;
+      right: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      font-size: 12px;
+      z-index: 10;
+    }
+    .legend-group { display: flex; align-items: center; gap: 20px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; color: #cbd5e1; }
+    .key-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .pk { background: #eab308; color: #000; }
+    .fk { background: #06b6d4; color: #000; }
+    .uk { background: #a855f7; color: #fff; }
+    .nn { background: #64748b; color: #fff; }
+    
+    .legend-domain {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-blue { background: #3b82f6; }
+    .dot-emerald { background: #10b981; }
+    .dot-purple { background: #8b5cf6; }
+    .dot-amber { background: #f59e0b; }
+    .dot-pink { background: #ec4899; }
+
+    /* Entity Table Cards */
+    .entity {
+      position: absolute;
+      background: #111c33;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      z-index: 5;
+      transition: all 0.2s ease;
+    }
+    .entity-header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      letter-spacing: 0.2px;
+    }
+    .hdr-blue { background: linear-gradient(90deg, #1e3a8a, #1d4ed8); color: #bfdbfe; }
+    .hdr-emerald { background: linear-gradient(90deg, #064e3b, #047857); color: #a7f3d0; }
+    .hdr-purple { background: linear-gradient(90deg, #4c1d95, #6d28d9); color: #ddd6fe; }
+    .hdr-amber { background: linear-gradient(90deg, #78350f, #b45309); color: #fde68a; }
+    .hdr-pink { background: linear-gradient(90deg, #831843, #be185d); color: #fbcfe8; }
+    .hdr-slate { background: linear-gradient(90deg, #1e293b, #334155); color: #cbd5e1; }
+
+    .table-sub { font-size: 11px; font-weight: normal; opacity: 0.8; }
+    
+    .field-list {
+      padding: 6px 0;
+      font-size: 11.5px;
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 100px;
+      padding: 4px 14px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+    }
+    .field-row:nth-child(even) {
+      background: rgba(255, 255, 255, 0.015);
+    }
+    .field-key { display: flex; align-items: center; }
+    .field-name {
+      font-weight: 600;
+      color: #e2e8f0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .field-type {
+      text-align: right;
+      color: #94a3b8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 10.5px;
+    }
+    .is-pk { color: #fef08a; font-weight: 700; }
+    .is-fk { color: #a5f3fc; }
+
+    /* SVG Lines Container */
+    svg.connections {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2900px;
+      height: 1950px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .rel-line {
+      fill: none;
+      stroke-width: 2px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.65;
+      transition: stroke-width 0.2s, opacity 0.2s;
+    }
+    .rel-user { stroke: #38bdf8; }
+    .rel-report { stroke: #34d399; }
+    .rel-event { stroke: #a78bfa; }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-badge">🌿</div>
+      <div class="header-title">
+        <h1>
+          Sevadeep CivicConnect • Database Entity Relationship (ER) Diagram
+          <span class="badge badge-ngo">NGO Pune, MH</span>
+          <span class="badge badge-mysql">MySQL 8.0 Engine</span>
+        </h1>
+        <p>Architectural Schema with Foreign Keys, Cardinalities, Indices, and Normalization</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <div class="stat-val">11</div>
+        <div class="stat-lbl">Relational Tables</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">19</div>
+        <div class="stat-lbl">Foreign Key Constraints</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">100%</div>
+        <div class="stat-lbl">3NF Normalized</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SVG Connectors -->
+  <svg class="connections" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Arrow markers -->
+      <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8"/>
+      </marker>
+      <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#34d399"/>
+      </marker>
+      <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#a78bfa"/>
+      </marker>
+      <!-- Crow foot (Many) marker -->
+      <marker id="crow-blue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 12 0 L 0 6 L 12 12 M 0 6 L 12 6" stroke="#38bdf8" stroke-width="1.8" fill="none"/>
+      </marker>
+      <marker id="crow-emerald" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 12 0 L 0 6 L 12 12 M 0 6 L 12 6" stroke="#34d399" stroke-width="1.8" fill="none"/>
+      </marker>
+      <marker id="crow-purple" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 12 0 L 0 6 L 12 12 M 0 6 L 12 6" stroke="#a78bfa" stroke-width="1.8" fill="none"/>
+      </marker>
+    </defs>
+
+    <!-- USERS (Right edge ~460, Center-Y 340) -> REPORTS.reporter_id (Left edge 750, Y 300) -->
+    <path d="M 460 280 H 600 V 290 H 750" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+    
+    <!-- USERS -> NOTIFICATIONS (Bottom edge 600 -> Top edge 720) -->
+    <path d="M 280 600 V 710" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+
+    <!-- USERS -> AUDIT_LOGS (Bottom edge 960 -> Top edge 1080) -->
+    <path d="M 280 970 V 1080" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+
+    <!-- REPORTS (Right edge 1230, Y 260) -> REPORT_PHOTOGRAPHS (Left edge 1480, Y 260) -->
+    <path d="M 1230 260 H 1480" class="rel-line rel-report" marker-end="url(#crow-emerald)"/>
+
+    <!-- REPORTS (Right edge 1230, Y 560) -> STATUS_HISTORY (Left edge 1480, Y 560) -->
+    <path d="M 1230 560 H 1480" class="rel-line rel-report" marker-end="url(#crow-emerald)"/>
+
+    <!-- REPORTS (Right edge 1230, Y 880) -> COMMUNITY_CONFIRMATIONS (Left edge 1480, Y 880) -->
+    <path d="M 1230 880 H 1480" class="rel-line rel-report" marker-end="url(#crow-emerald)"/>
+
+    <!-- REPORTS (Right edge 1230, Y 1000) -> COMMENTS (Left edge 1480, Y 1220) -->
+    <path d="M 1230 1000 H 1350 V 1220 H 1480" class="rel-line rel-report" marker-end="url(#crow-emerald)"/>
+
+    <!-- REPORTS (Bottom edge 990, X 990) -> VOLUNTEER_ASSIGNMENTS (Top edge 1200, X 990) -->
+    <path d="M 990 1030 V 1200" class="rel-line rel-report" marker-end="url(#crow-emerald)"/>
+
+    <!-- USERS (Right edge 460, Y 520) -> VOLUNTEER_ASSIGNMENTS (Left edge 750, Y 1320) -->
+    <path d="M 460 520 H 580 V 1320 H 750" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+
+    <!-- USERS (Top edge 180, X 350) -> EVENTS (Top edge 240, X 2150) across top header bypass -->
+    <path d="M 350 180 V 145 H 2250 V 240" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+
+    <!-- EVENTS (Bottom edge 820, X 2250) -> EVENT_REGISTRATIONS (Top edge 980, X 2250) -->
+    <path d="M 2250 820 V 980" class="rel-line rel-event" marker-end="url(#crow-purple)"/>
+
+    <!-- USERS -> EVENT_REGISTRATIONS (Long bus via bottom) -->
+    <path d="M 420 600 V 680 H 640 V 1720 H 2150 V 1340" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+
+    <!-- USERS -> COMMUNITY_CONFIRMATIONS (Route above confirmations) -->
+    <path d="M 460 400 H 680 V 820 H 1480" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+
+    <!-- USERS -> COMMENTS -->
+    <path d="M 460 460 H 710 V 1180 H 1480" class="rel-line rel-user" marker-end="url(#crow-blue)"/>
+  </svg>
+
+  <!-- ================= ENTITY 1: USERS ================= -->
+  <div class="entity" style="top: 180px; left: 100px; width: 360px;">
+    <div class="entity-header hdr-blue">
+      <span>👤 users</span>
+      <span class="table-sub">Core Auth & Profiles</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge uk">UK</span></div><div class="field-name">email</div><div class="field-type">VARCHAR(150)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">password_hash</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">name</div><div class="field-type">VARCHAR(100)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">phone</div><div class="field-type">VARCHAR(20)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">role</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">address</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">area</div><div class="field-type">VARCHAR(100)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">avatar_url</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">points</div><div class="field-type">INT DEFAULT 0</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">is_active</div><div class="field-type">BOOLEAN</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">updated_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 2: NOTIFICATIONS ================= -->
+  <div class="entity" style="top: 710px; left: 100px; width: 360px;">
+    <div class="entity-header hdr-blue">
+      <span>🔔 notifications</span>
+      <span class="table-sub">In-App User Alerts</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">user_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">title</div><div class="field-type">VARCHAR(150)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">message</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">type</div><div class="field-type">VARCHAR(50)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">link</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">is_read</div><div class="field-type">BOOLEAN</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 3: AUDIT_LOGS ================= -->
+  <div class="entity" style="top: 1080px; left: 100px; width: 360px;">
+    <div class="entity-header hdr-pink">
+      <span>🛡️ audit_logs</span>
+      <span class="table-sub">Platform Security & Audit</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">user_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">action</div><div class="field-type">VARCHAR(100)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">target_type</div><div class="field-type">VARCHAR(50)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">target_id</div><div class="field-type">INT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">details</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">ip_address</div><div class="field-type">VARCHAR(45)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 4: REPORTS ================= -->
+  <div class="entity" style="top: 180px; left: 750px; width: 480px;">
+    <div class="entity-header hdr-emerald">
+      <span>📍 reports</span>
+      <span class="table-sub">Civic Grievances & Geolocation</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge uk">UK</span></div><div class="field-name">reference_no</div><div class="field-type">VARCHAR(50)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">reporter_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">title</div><div class="field-type">VARCHAR(200)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">description</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">category</div><div class="field-type">VARCHAR(100)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">severity</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">status</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">location_address</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">area</div><div class="field-type">VARCHAR(100)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">latitude</div><div class="field-type">DECIMAL(10,8)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">longitude</div><div class="field-type">DECIMAL(11,8)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">is_public</div><div class="field-type">BOOLEAN FALSE</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">assigned_volunteer_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">coordinator_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">coordinator_notes</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">resolution_notes</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">resolution_photo</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">reporter_feedback</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">reporter_rating</div><div class="field-type">INT (1-5★)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">reporter_confirmed_resolution</div><div class="field-type">BOOLEAN</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">municipal_referral_status</div><div class="field-type">VARCHAR(150)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">updated_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 5: REPORT_PHOTOGRAPHS ================= -->
+  <div class="entity" style="top: 180px; left: 1480px; width: 440px;">
+    <div class="entity-header hdr-emerald">
+      <span>📷 report_photographs</span>
+      <span class="table-sub">Photographic Proof</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">report_id</div><div class="field-type">INT &rarr; reports</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">photo_url</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">caption</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">is_primary</div><div class="field-type">BOOLEAN TRUE</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">photo_type</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">uploaded_by_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 6: STATUS_HISTORY ================= -->
+  <div class="entity" style="top: 480px; left: 1480px; width: 440px;">
+    <div class="entity-header hdr-emerald">
+      <span>⏱️ status_history</span>
+      <span class="table-sub">Workflow Audit Trail</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">report_id</div><div class="field-type">INT &rarr; reports</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">previous_status</div><div class="field-type">VARCHAR(50)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">new_status</div><div class="field-type">VARCHAR(50)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">changed_by_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">notes</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 7: COMMUNITY_CONFIRMATIONS ================= -->
+  <div class="entity" style="top: 770px; left: 1480px; width: 440px;">
+    <div class="entity-header hdr-amber">
+      <span>👍 community_confirmations</span>
+      <span class="table-sub">Neighborhood Upvotes</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">report_id</div><div class="field-type">INT &rarr; reports</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">user_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge uk">UK</span></div><div class="field-name" style="font-size:10px;">(report_id, user_id)</div><div class="field-type">Composite UK</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 8: COMMENTS ================= -->
+  <div class="entity" style="top: 1010px; left: 1480px; width: 440px;">
+    <div class="entity-header hdr-amber">
+      <span>💬 comments</span>
+      <span class="table-sub">Public Discussion & Moderation</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">report_id</div><div class="field-type">INT &rarr; reports</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">user_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">comment_text</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">photo_url</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">is_hidden</div><div class="field-type">BOOLEAN FALSE</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">moderated_by_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">moderation_reason</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 9: VOLUNTEER_ASSIGNMENTS ================= -->
+  <div class="entity" style="top: 1200px; left: 750px; width: 480px;">
+    <div class="entity-header hdr-purple">
+      <span>🛠️ volunteer_assignments</span>
+      <span class="table-sub">Coordinator Tasks Dispatch</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">report_id</div><div class="field-type">INT &rarr; reports</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">volunteer_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">assigned_by_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">assignment_notes</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">progress_status</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">completion_notes</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">assigned_at</div><div class="field-type">TIMESTAMP</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">completed_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 10: EVENTS ================= -->
+  <div class="entity" style="top: 240px; left: 2060px; width: 440px;">
+    <div class="entity-header hdr-purple">
+      <span>🌱 events</span>
+      <span class="table-sub">Community Drives & Impact</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">title</div><div class="field-type">VARCHAR(200)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">category</div><div class="field-type">VARCHAR(100)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">description</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">event_date</div><div class="field-type">DATE</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">start_time</div><div class="field-type">VARCHAR(20)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">end_time</div><div class="field-type">VARCHAR(20)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">location_name</div><div class="field-type">VARCHAR(200)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">latitude</div><div class="field-type">DECIMAL(10,8)</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge nn">NN</span></div><div class="field-name">longitude</div><div class="field-type">DECIMAL(11,8)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">total_slots</div><div class="field-type">INT DEFAULT 30</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">coordinator_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">cover_image</div><div class="field-type">VARCHAR(255)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">status</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">completion_summary</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">waste_collected_kg</div><div class="field-type">DECIMAL(8,2)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">trees_planted</div><div class="field-type">INT DEFAULT 0</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">created_at</div><div class="field-type">TIMESTAMP</div></div>
+    </div>
+  </div>
+
+  <!-- ================= ENTITY 11: EVENT_REGISTRATIONS ================= -->
+  <div class="entity" style="top: 980px; left: 2060px; width: 440px;">
+    <div class="entity-header hdr-purple">
+      <span>📝 event_registrations</span>
+      <span class="table-sub">Volunteer Attendance & Hours</span>
+    </div>
+    <div class="field-list">
+      <div class="field-row"><div class="field-key"><span class="key-badge pk">PK</span></div><div class="field-name is-pk">id</div><div class="field-type">INT AUTO</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">event_id</div><div class="field-type">INT &rarr; events</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge fk">FK</span></div><div class="field-name is-fk">user_id</div><div class="field-type">INT &rarr; users</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">registration_status</div><div class="field-type">ENUM(...)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">hours_contributed</div><div class="field-type">DECIMAL(4,2)</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">feedback</div><div class="field-type">TEXT</div></div>
+      <div class="field-row"><div class="field-key"></div><div class="field-name">registered_at</div><div class="field-type">TIMESTAMP</div></div>
+      <div class="field-row"><div class="field-key"><span class="key-badge uk">UK</span></div><div class="field-name" style="font-size:10px;">(event_id, user_id)</div><div class="field-type">Composite UK</div></div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-group">
+      <span style="font-weight:700; color:#fff;">Constraint Badges:</span>
+      <div class="legend-item"><span class="key-badge pk">PK</span> Primary Key</div>
+      <div class="legend-item"><span class="key-badge fk">FK</span> Foreign Key Reference</div>
+      <div class="legend-item"><span class="key-badge uk">UK</span> Unique Key Constraint</div>
+      <div class="legend-item"><span class="key-badge nn">NN</span> NOT NULL Field</div>
+    </div>
+    <div class="legend-group">
+      <span style="font-weight:700; color:#fff;">Functional Domains:</span>
+      <div class="legend-domain"><span class="dot dot-blue"></span> Identity &amp; Auth</div>
+      <div class="legend-domain"><span class="dot dot-emerald"></span> Grievances &amp; Triage</div>
+      <div class="legend-domain"><span class="dot dot-amber"></span> Community &amp; Social</div>
+      <div class="legend-domain"><span class="dot dot-purple"></span> Field Operations</div>
+      <div class="legend-domain"><span class="dot dot-pink"></span> Security &amp; Audit</div>
+    </div>
+    <div class="legend-group">
+      <span style="font-weight:700; color:#fff;">Cardinality:</span>
+      <span style="color:#94a3b8;">1 to N (One-to-Many Crow's Foot)</span>
+    </div>
+  </div>
+</body>
+</html>

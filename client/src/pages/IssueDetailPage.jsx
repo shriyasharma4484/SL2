@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { issueService, adminService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import CategoryBadge from '../components/CategoryBadge';
@@ -34,6 +35,7 @@ import {
 export default function IssueDetailPage() {
   const { id } = useParams();
   const { user, isAuthenticated, isCoordinator, isVolunteer } = useAuth();
+  const { t, lang, translateStatus } = useLanguage();
   const navigate = useNavigate();
 
   const [issue, setIssue] = useState(null);
@@ -266,7 +268,7 @@ export default function IssueDetailPage() {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-700 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Community Issues</span>
+          <span>{lang === 'mr' ? 'नागरी समस्यांकडे परत' : 'Back to Community Issues'}</span>
         </Link>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">
@@ -333,7 +335,7 @@ export default function IssueDetailPage() {
             {issue.photographs && issue.photographs.length > 0 && (
               <div className="space-y-3 pt-2">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  Submitted Evidence & Photographs
+                  {lang === 'mr' ? 'सादर केलेले पुरावे व छायाचित्रे' : 'Submitted Evidence & Photographs'}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {issue.photographs.map((photo) => (
@@ -419,16 +421,16 @@ export default function IssueDetailPage() {
                   }`}
                 >
                   <ThumbsUp className={`w-4 h-4 ${issue.user_has_confirmed ? 'text-white' : 'text-emerald-600'}`} />
-                  <span>{issue.user_has_confirmed ? 'Confirmed by You' : 'Support / Confirm This Issue'}</span>
+                  <span>{issue.user_has_confirmed ? (lang === 'mr' ? 'तुम्ही पाठिंबा दिला आहे' : 'Confirmed by You') : (lang === 'mr' ? 'या समस्येला पाठिंबा द्या' : 'Support / Confirm This Issue')}</span>
                 </button>
 
                 <span className="text-xs text-slate-600">
-                  <strong>{issue.confirmations_count || 0}</strong> neighborhood residents confirmed
+                  <strong>{issue.confirmations_count || 0}</strong> {lang === 'mr' ? 'नागरिकांनी पुष्टी दिली' : 'neighborhood residents confirmed'}
                 </span>
               </div>
 
               <div className="text-[11px] text-slate-400">
-                Duplicate confirmations prevented per account
+                {lang === 'mr' ? 'एका खात्यातून एकदाच पाठिंबा' : 'Duplicate confirmations prevented per account'}
               </div>
             </div>
 
@@ -436,7 +438,7 @@ export default function IssueDetailPage() {
             <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 bg-slate-50/70 -mx-6 -mb-6 p-4 rounded-b-3xl">
               <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
                 <Share2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span>Mobilize your neighborhood for this issue:</span>
+                <span>{lang === 'mr' ? 'या समस्येसाठी परिसरातील नागरिकांना संघटित करा:' : 'Mobilize your neighborhood for this issue:'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <a
@@ -447,7 +449,7 @@ export default function IssueDetailPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs transition-colors"
                 >
-                  <span>💬 Share on WhatsApp</span>
+                  <span>💬 {lang === 'mr' ? 'व्हॉट्सॲपवर पाठवा' : 'Share on WhatsApp'}</span>
                 </a>
                 <button
                   type="button"
@@ -547,7 +549,7 @@ export default function IssueDetailPage() {
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-emerald-700" />
                 <h3 className="font-extrabold text-sm text-slate-900">
-                  Community Discussion & Updates ({issue.comments?.length || 0})
+                  {lang === 'mr' ? 'नागरी चर्चा व माहिती' : 'Community Discussion & Updates'} ({issue.comments?.length || 0})
                 </h3>
               </div>
               <span className="text-[11px] text-slate-400">
@@ -647,7 +649,7 @@ export default function IssueDetailPage() {
                   className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Post Comment</span>
+                  <span>{lang === 'mr' ? 'प्रतिक्रिया नोंदवा' : 'Post Comment'}</span>
                 </button>
               </div>
             </form>
@@ -763,7 +765,7 @@ export default function IssueDetailPage() {
           <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs space-y-3">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Location in Pune</span>
+              <span>{lang === 'mr' ? 'पुण्यातील नकाशा स्थान' : 'Location in Pune'}</span>
             </h3>
 
             <LeafletMap
@@ -785,7 +787,7 @@ export default function IssueDetailPage() {
           <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs space-y-4">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-emerald-700" />
-              <span>Status History & Audit Timeline</span>
+              <span>{lang === 'mr' ? 'कामाची सद्यस्थिती व इतिहास' : 'Status History & Audit Timeline'}</span>
             </h3>
 
             <div className="space-y-4 relative before:absolute before:inset-0 before:left-3 before:w-0.5 before:bg-slate-200">

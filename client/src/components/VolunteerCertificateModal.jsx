@@ -1,26 +1,29 @@
 import React from 'react';
 import { Award, Printer, X, CheckCircle2, ShieldCheck, QrCode } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function VolunteerCertificateModal({ user, isOpen, onClose }) {
+  const { t, lang } = useLanguage();
   if (!isOpen || !user) return null;
 
   const certNumber = `SVD-CERT-2026-${String(user.id || 1).padStart(4, '0')}${Math.floor(Math.random() * 89 + 10)}`;
-  const issueDate = new Date().toLocaleDateString('en-IN', {
+  const issueDate = new Date().toLocaleDateString(lang === 'mr' ? 'mr-IN' : 'en-IN', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   });
 
   const handlePrint = () => {
+    const isMr = lang === 'mr';
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html>
         <head>
-          <title>Volunteer Certificate - ${user.name}</title>
+          <title>${isMr ? 'स्वयंसेवक प्रमाणपत्र' : 'Volunteer Certificate'} - ${user.name}</title>
           <style>
             @page { size: landscape; margin: 15mm; }
             body {
-              font-family: 'Georgia', serif;
+              font-family: 'Georgia', 'Mukta', serif;
               margin: 0;
               padding: 20px;
               color: #1e293b;
@@ -139,40 +142,42 @@ export default function VolunteerCertificateModal({ user, isOpen, onClose }) {
         <body>
           <div class="cert-box">
             <div class="watermark">SEVADEEP NGO</div>
-            <div class="ngo-name">Sevadeep Foundation &amp; CivicConnect</div>
-            <div class="ngo-sub">Registered Non-Governmental Organization • Pune, Maharashtra, India</div>
-            <div class="cert-title">Certificate of Verified Civic Service</div>
-            <div class="presented">This certificate is proudly awarded to</div>
+            <div class="ngo-name">${isMr ? 'सेवादीप स्वयंसेवी संस्था आणि सिविक-कनेक्ट' : 'Sevadeep Foundation &amp; CivicConnect'}</div>
+            <div class="ngo-sub">${isMr ? 'नोंदणीकृत स्वयंसेवी संस्था • पुणे, महाराष्ट्र, भारत' : 'Registered Non-Governmental Organization • Pune, Maharashtra, India'}</div>
+            <div class="cert-title">${isMr ? 'प्रमाणित नागरी सेवा सन्मानपत्र' : 'Certificate of Verified Civic Service'}</div>
+            <div class="presented">${isMr ? 'हे प्रमाणपत्र सन्मानपूर्वक बहाल करण्यात येत आहे' : 'This certificate is proudly awarded to'}</div>
             <div class="recipient">${user.name}</div>
             <div class="reason">
-              For exemplary dedication to community sanitation, civic improvement, and active volunteer service in Pune. Their verified contribution directly advances the United Nations Sustainable Development Goals (SDG 11: Sustainable Cities &amp; Communities).
+              ${isMr
+                ? 'पुणे शहरातील नागरी स्वच्छता, पर्यावरण संवर्धन आणि सार्वजनिक सुधारणेसाठी दिलेल्या उत्कृष्ट योगदानाबद्दल आणि समर्पित स्वयंसेवक सेवेबद्दल. हे योगदान शाश्वत शहरांच्या संयुक्त राष्ट्र विकास उद्दिष्टांना (SDG 11) प्रत्यक्ष बळ देते.'
+                : 'For exemplary dedication to community sanitation, civic improvement, and active volunteer service in Pune. Their verified contribution directly advances the United Nations Sustainable Development Goals (SDG 11: Sustainable Cities &amp; Communities).'}
             </div>
             <div class="metrics">
               <div class="metric-item">
-                <div class="metric-val">${user.service_hours || 12} Hours</div>
-                <div class="metric-lbl">Verified Service</div>
+                <div class="metric-val">${user.service_hours || 12} ${isMr ? 'तास' : 'Hours'}</div>
+                <div class="metric-lbl">${isMr ? 'प्रमाणित सेवा' : 'Verified Service'}</div>
               </div>
               <div class="metric-item">
-                <div class="metric-val">${user.points || 75} Points</div>
-                <div class="metric-lbl">Civic Impact Score</div>
+                <div class="metric-val">${user.points || 75} ${isMr ? 'गुण' : 'Points'}</div>
+                <div class="metric-lbl">${isMr ? 'नागरी प्रभाव' : 'Civic Impact Score'}</div>
               </div>
               <div class="metric-item">
-                <div class="metric-val">Pune, MH</div>
-                <div class="metric-lbl">Operational Area</div>
+                <div class="metric-val">${isMr ? 'पुणे, महाराष्ट्र' : 'Pune, MH'}</div>
+                <div class="metric-lbl">${isMr ? 'कार्यक्षेत्र' : 'Operational Area'}</div>
               </div>
             </div>
             <div class="footer-row">
               <div>
-                <div class="sign-line">Dr. Ananya Joshi</div>
-                <div style="font-size: 10px; color: #64748b;">Chief Field Coordinator, Sevadeep</div>
+                <div class="sign-line">${isMr ? 'डॉ. अनन्या जोशी' : 'Dr. Ananya Joshi'}</div>
+                <div style="font-size: 10px; color: #64748b;">${isMr ? 'मुख्य क्षेत्रीय समन्वयक, सेवादीप' : 'Chief Field Coordinator, Sevadeep'}</div>
               </div>
               <div class="cert-id">
-                Certificate ID: <strong>${certNumber}</strong><br/>
-                Issued: ${issueDate}
+                ${isMr ? 'प्रमाणपत्र क्र.' : 'Certificate ID:'} <strong>${certNumber}</strong><br/>
+                ${isMr ? 'दिनांक:' : 'Issued:'} ${issueDate}
               </div>
               <div>
-                <div class="sign-line">Vikram Deshmukh</div>
-                <div style="font-size: 10px; color: #64748b;">President &amp; Trustee, Sevadeep NGO</div>
+                <div class="sign-line">${isMr ? 'विक्रम देशमुख' : 'Vikram Deshmukh'}</div>
+                <div style="font-size: 10px; color: #64748b;">${isMr ? 'अध्यक्ष व विश्वस्त, सेवादीप' : 'President &amp; Trustee, Sevadeep NGO'}</div>
               </div>
             </div>
           </div>
@@ -195,16 +200,18 @@ export default function VolunteerCertificateModal({ user, isOpen, onClose }) {
             </div>
             <div>
               <h3 className="font-extrabold text-sm text-slate-900">
-                Official Volunteer Service Credential
+                {lang === 'mr' ? 'अधिकृत स्वयंसेवक सेवा सन्मान' : 'Official Volunteer Service Credential'}
               </h3>
               <p className="text-[11px] text-slate-500">
-                Valid for Academic CSR Credits, University Portfolios &amp; Job Applications
+                {lang === 'mr'
+                  ? 'विद्यापीठ सीएसआर क्रेडिट, रेझ्युमे आणि नोकरी अर्जांसाठी वैध'
+                  : 'Valid for Academic CSR Credits, University Portfolios & Job Applications'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600"
+            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -213,31 +220,45 @@ export default function VolunteerCertificateModal({ user, isOpen, onClose }) {
         {/* Certificate Preview Card */}
         <div className="border-4 border-double border-emerald-900/20 bg-emerald-50/20 p-6 rounded-2xl text-center space-y-4 relative overflow-hidden">
           <div className="text-[10px] uppercase font-bold tracking-widest text-emerald-800">
-            Sevadeep NGO • CivicConnect Pune
+            {lang === 'mr' ? 'सेवादीप स्वयंसेवी संस्था • सिविक-कनेक्ट पुणे' : 'Sevadeep NGO • CivicConnect Pune'}
           </div>
           <h2 className="text-xl sm:text-2xl font-serif italic text-emerald-950 font-bold">
-            Certificate of Verified Civic Service
+            {lang === 'mr' ? 'प्रमाणित नागरी सेवा सन्मानपत्र' : 'Certificate of Verified Civic Service'}
           </h2>
-          <p className="text-xs text-slate-500 uppercase tracking-wider">Presented To</p>
+          <p className="text-xs text-slate-500 uppercase tracking-wider">
+            {lang === 'mr' ? 'हे प्रमाणपत्र सन्मानपूर्वक बहाल करण्यात येत आहे' : 'Presented To'}
+          </p>
           <div className="text-2xl font-extrabold text-slate-900 border-b border-slate-300 pb-1 inline-block px-6">
             {user.name}
           </div>
           <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-            In recognition of verified on-ground contributions toward community clean-up drives, solid waste management, and civic advocacy in Pune.
+            {lang === 'mr'
+              ? 'पुणे शहरातील स्वच्छता मोहिमा, कचरा व्यवस्थापन आणि नागरी सुधारणेसाठी केलेल्या उत्कृष्ट आणि प्रमाणित योगदानाबद्दल.'
+              : 'In recognition of verified on-ground contributions toward community clean-up drives, solid waste management, and civic advocacy in Pune.'}
           </p>
 
           <div className="flex justify-center gap-6 pt-2">
             <div className="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs">
-              <div className="text-base font-bold text-emerald-800">{user.service_hours || 12} hrs</div>
-              <div className="text-[10px] text-slate-400 uppercase font-semibold">Verified Service</div>
+              <div className="text-base font-bold text-emerald-800">
+                {user.service_hours || 12} {lang === 'mr' ? 'तास' : 'hrs'}
+              </div>
+              <div className="text-[10px] text-slate-400 uppercase font-semibold">
+                {lang === 'mr' ? 'प्रमाणित सेवा' : 'Verified Service'}
+              </div>
             </div>
             <div className="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs">
-              <div className="text-base font-bold text-emerald-800">{user.points || 75} pts</div>
-              <div className="text-[10px] text-slate-400 uppercase font-semibold">Civic Karma</div>
+              <div className="text-base font-bold text-emerald-800">
+                {user.points || 75} {lang === 'mr' ? 'गुण' : 'pts'}
+              </div>
+              <div className="text-[10px] text-slate-400 uppercase font-semibold">
+                {lang === 'mr' ? 'नागरी प्रभाव' : 'Civic Karma'}
+              </div>
             </div>
             <div className="bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs">
-              <div className="text-base font-bold text-emerald-800">Pune, MH</div>
-              <div className="text-[10px] text-slate-400 uppercase font-semibold">Location</div>
+              <div className="text-base font-bold text-emerald-800">{lang === 'mr' ? 'पुणे, महाराष्ट्र' : 'Pune, MH'}</div>
+              <div className="text-[10px] text-slate-400 uppercase font-semibold">
+                {lang === 'mr' ? 'स्थान' : 'Location'}
+              </div>
             </div>
           </div>
 
@@ -245,7 +266,7 @@ export default function VolunteerCertificateModal({ user, isOpen, onClose }) {
             <span className="font-mono">{certNumber}</span>
             <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold">
               <ShieldCheck className="w-3.5 h-3.5" />
-              Verified by Sevadeep Triage Board
+              {lang === 'mr' ? 'सेवादीप मंडळाद्वारे प्रमाणित' : 'Verified by Sevadeep Triage Board'}
             </span>
           </div>
         </div>
@@ -253,21 +274,21 @@ export default function VolunteerCertificateModal({ user, isOpen, onClose }) {
         {/* Modal Actions */}
         <div className="flex items-center justify-between pt-2">
           <span className="text-xs text-slate-500">
-            Format: Landscape PDF / Hardcopy Print
+            {lang === 'mr' ? 'स्वरूप: लँडस्केप पीडीएफ / मुद्रित प्रत' : 'Format: Landscape PDF / Hardcopy Print'}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50"
+              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 cursor-pointer"
             >
-              Close
+              {t('close')}
             </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print / Download Certificate PDF</span>
+              <span>{lang === 'mr' ? 'प्रमाणपत्र पीडीएफ प्रिंट / डाउनलोड करा' : 'Print / Download Certificate PDF'}</span>
             </button>
           </div>
         </div>

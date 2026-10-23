@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { issueService } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import CategoryBadge from '../components/CategoryBadge';
@@ -22,6 +23,7 @@ import {
 
 export default function VolunteerDashboardPage() {
   const { user } = useAuth();
+  const { t, lang, translateStatus } = useLanguage();
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCertModal, setShowCertModal] = useState(false);
@@ -65,14 +67,14 @@ export default function VolunteerDashboardPage() {
 
       const res = await issueService.submitVolunteerProgress(selectedTask.report_id, formData);
       if (res.data.success) {
-        alert(res.data.message);
+        alert(lang === 'mr' ? 'कामाचा अहवाल यशस्वीरित्या सादर केला गेला!' : res.data.message);
         setSelectedTask(null);
         setCompletionNotes('');
         setProgressPhoto(null);
         loadAssignments();
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to submit update.');
+      alert(err.response?.data?.message || (lang === 'mr' ? 'अहवाल सादर करण्यात त्रुटी आली.' : 'Failed to submit update.'));
     } finally {
       setSubmittingProgress(false);
     }
@@ -85,13 +87,13 @@ export default function VolunteerDashboardPage() {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-300 bg-white/10 px-3 py-1 rounded-full border border-white/20">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Sevadeep Volunteer Workspace</span>
+            <span>{t('volWorkspace')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Volunteer Dashboard: {user?.name}
+            {t('volDashboardTitle')} {user?.name}
           </h1>
           <p className="text-xs sm:text-sm text-slate-200">
-            Manage your assigned field actions, upload completion photographs, and track your volunteer service hours in Pune.
+            {t('volDashboardDesc')}
           </p>
         </div>
 
@@ -99,11 +101,11 @@ export default function VolunteerDashboardPage() {
           <div className="flex items-center gap-3">
             <div className="bg-white/10 border border-white/20 p-4 rounded-2xl text-center backdrop-blur-sm">
               <div className="text-2xl font-extrabold text-emerald-300">{user?.points || 75}</div>
-              <p className="text-[11px] text-slate-300 font-semibold">Impact Points</p>
+              <p className="text-[11px] text-slate-300 font-semibold">{t('impactPoints')}</p>
             </div>
             <div className="bg-white/10 border border-white/20 p-4 rounded-2xl text-center backdrop-blur-sm">
               <div className="text-2xl font-extrabold text-teal-300">{assignments.length}</div>
-              <p className="text-[11px] text-slate-300 font-semibold">Assigned Tasks</p>
+              <p className="text-[11px] text-slate-300 font-semibold">{t('assignedTasks')}</p>
             </div>
           </div>
 
@@ -113,7 +115,7 @@ export default function VolunteerDashboardPage() {
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer"
           >
             <Award className="w-4 h-4 text-emerald-950" />
-            <span>Generate Official Certificate</span>
+            <span>{t('generateCertificate')}</span>
           </button>
         </div>
       </div>
@@ -122,31 +124,31 @@ export default function VolunteerDashboardPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
-            My Assigned Community Tasks ({assignments.length})
+            {t('myAssignedTasks')} ({assignments.length})
           </h2>
           <span className="text-xs text-slate-500">
-            Coordinator reviews required before ticket closure
+            {t('coordinatorReviewRequired')}
           </span>
         </div>
 
         {loading ? (
           <div className="py-20 text-center text-slate-400 text-xs">
             <Loader2 className="w-6 h-6 animate-spin mx-auto text-emerald-600 mb-2" />
-            <span>Loading assigned tasks...</span>
+            <span>{t('loadingAssignedTasks')}</span>
           </div>
         ) : assignments.length === 0 ? (
           <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3">
             <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-            <h3 className="font-bold text-slate-800 text-base">All Caught Up!</h3>
+            <h3 className="font-bold text-slate-800 text-base">{t('allCaughtUp')}</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              You currently have no pending assigned tasks. Explore upcoming weekend community drives!
+              {t('noPendingTasks')}
             </p>
             <Link
               to="/activities"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold"
             >
               <Calendar className="w-4 h-4" />
-              <span>Browse Volunteer Activities</span>
+              <span>{t('browseActivities')}</span>
             </Link>
           </div>
         ) : (
@@ -185,16 +187,16 @@ export default function VolunteerDashboardPage() {
                     </div>
 
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs space-y-1">
-                      <p className="font-bold text-slate-700">Coordinator Instructions:</p>
+                      <p className="font-bold text-slate-700">{t('coordinatorInstructions')}</p>
                       <p className="text-[11px] text-slate-600 leading-relaxed">
-                        {item.assignment_notes || 'Please visit location, assess situation, and coordinate cleanup.'}
+                        {item.assignment_notes || t('defaultInstructions')}
                       </p>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 text-[11px]">Task Status:</span>
+                      <span className="text-slate-500 text-[11px]">{t('taskStatus')}</span>
                       <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px] uppercase">
-                        {item.progress_status}
+                        {translateStatus(item.progress_status)}
                       </span>
                     </div>
                   </div>
@@ -205,7 +207,7 @@ export default function VolunteerDashboardPage() {
                     to={`/issues/${item.report_id}`}
                     className="text-xs font-bold text-slate-600 hover:text-emerald-700"
                   >
-                    View Details
+                    {t('details')}
                   </Link>
 
                   <button
@@ -215,9 +217,9 @@ export default function VolunteerDashboardPage() {
                       setProgressStatus(item.progress_status);
                       setCompletionNotes(item.completion_notes || '');
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs"
+                    className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs cursor-pointer"
                   >
-                    Update Progress
+                    {t('updateTaskProgress')}
                   </button>
                 </div>
               </div>
@@ -233,14 +235,14 @@ export default function VolunteerDashboardPage() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="font-extrabold text-sm text-slate-900">
-                  Submit Field Progress & Proof
+                  {lang === 'mr' ? 'कामाची सद्यस्थिती व पुरावा सादर करा' : 'Submit Field Progress & Proof'}
                 </h3>
                 <p className="text-[11px] text-slate-500">{selectedTask.reference_no}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedTask(null)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 ✕
               </button>
@@ -249,35 +251,35 @@ export default function VolunteerDashboardPage() {
             <form onSubmit={handleProgressSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Task Status
+                  {t('newProgressStatus')}
                 </label>
                 <select
                   value={progressStatus}
                   onChange={(e) => setProgressStatus(e.target.value)}
                   className="w-full text-xs p-2.5 rounded-xl border border-slate-300 outline-hidden bg-white"
                 >
-                  <option value="In Progress">In Progress (Action Ongoing)</option>
-                  <option value="Work Submitted">Work Submitted (Awaiting Coordinator Review)</option>
+                  <option value="In Progress">{lang === 'mr' ? 'काम सुरू आहे (प्रगतीपथावर)' : 'In Progress (Action Ongoing)'}</option>
+                  <option value="Work Submitted">{lang === 'mr' ? 'काम पूर्ण करून सादर केले (समन्वयक पडताळणी बाकी)' : 'Work Submitted (Awaiting Coordinator Review)'}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Field Progress Notes
+                  {lang === 'mr' ? 'कामाचे सविस्तर वर्णन' : 'Field Progress Notes'}
                 </label>
                 <textarea
                   rows="3"
                   required
                   value={completionNotes}
                   onChange={(e) => setCompletionNotes(e.target.value)}
-                  placeholder="Detail actions taken (e.g. Cleared 4 sacks of debris, distributed leaflets, disinfected drain...)"
+                  placeholder={t('notesPlaceholder')}
                   className="w-full text-xs p-3 rounded-xl border border-slate-300 outline-hidden"
                 ></textarea>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Upload Photographic Proof (Required for verification)
+                  {t('uploadCompletionPhoto')}
                 </label>
                 <input
                   type="file"
@@ -288,24 +290,24 @@ export default function VolunteerDashboardPage() {
               </div>
 
               <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
-                ⚠️ <strong>Quality Verification Rule:</strong> A report is not marked as resolved solely because a photograph is uploaded. A Sevadeep coordinator will verify the work before closing the ticket.
+                ⚠️ <strong>{lang === 'mr' ? 'पडताळणी नियम:' : 'Quality Verification Rule:'}</strong> {lang === 'mr' ? 'केवळ फोटो अपलोड केल्याने तक्रार निकाली निघत नाही. सेवादीप समन्वयक प्रत्यक्ष पडताळणी करूनच तक्रार पूर्ण घोषित करतील.' : 'A report is not marked as resolved solely because a photograph is uploaded. A Sevadeep coordinator will verify the work before closing the ticket.'}
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setSelectedTask(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold cursor-pointer"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={submittingProgress}
-                  className="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   {submittingProgress ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                  <span>Submit for Coordinator Review</span>
+                  <span>{submittingProgress ? t('submittingUpdate') : (lang === 'mr' ? 'समन्वयकाकडे सादर करा' : 'Submit for Coordinator Review')}</span>
                 </button>
               </div>
             </form>

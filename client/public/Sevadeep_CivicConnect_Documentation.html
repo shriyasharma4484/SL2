@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sevadeep CivicConnect - Complete Project Documentation</title>
+  <style>
+    :root {
+      --primary: #047857;
+      --primary-dark: #064e3b;
+      --primary-light: #ecfdf5;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --bg-card: #f8fafc;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      background-color: #f1f5f9;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 0.5rem;
+    }
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+    }
+    li {
+      margin-bottom: 0.4rem;
+    }
+    strong {
+      color: var(--text-main);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.875rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    tr:nth-child(even) {
+      background-color: #fcfdfe;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+    }
+    .card-accent {
+      border-left: 4px solid var(--primary);
+    }
+    code {
+      background: #f1f5f9;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.375rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85em;
+      color: #be185d;
+    }
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 1rem;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    .tag {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-green { background: #dcfce7; color: #166534; }
+    .tag-blue { background: #dbeafe; color: #1e40af; }
+    .tag-amber { background: #fef3c7; color: #92400e; }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .actions, .no-print {
+        display: none !important;
+      }
+      h2 {
+        page-break-after: avoid;
+      }
+      table, pre, .card {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-bar">
+      <div>
+        <span class="logo-badge">🌿 Sevadeep NGO • Pune</span>
+        <h1>Sevadeep CivicConnect</h1>
+        <p style="margin: 0; font-weight: 500;">Community Issue Reporting & Grassroots Resolution Platform</p>
+      </div>
+      <div class="actions no-print">
+        <button onclick="window.print()" class="btn btn-primary">
+          🖨️ Download / Print as PDF
+        </button>
+        <a href="Sevadeep_CivicConnect_Documentation.md" download class="btn btn-secondary">
+          ⬇️ Download Markdown (.md)
+        </a>
+        <a href="sevadeep_civicconnect_dump.sql" download class="btn btn-secondary">
+          💾 Download SQL Dump (.sql)
+        </a>
+      </div>
+    </div>
+
+    <div class="card card-accent">
+      <p style="margin: 0; font-size: 0.95rem;">
+        <strong>Platform Tagline:</strong> <em>"Your Community. Your Voice. Together, We Create Change."</em><br />
+        <strong>Release Version:</strong> 1.0.0 Production Release &nbsp;|&nbsp; <strong>Date:</strong> October 2026<br />
+        <strong>Designed For:</strong> Sevadeep NGO, Pune, Maharashtra, India
+      </p>
+    </div>
+
+    <h2>1. Executive Summary & What Has Been Done</h2>
+    <p>
+      <strong>Sevadeep CivicConnect</strong> is a full-stack, enterprise-grade civic reporting, community engagement, and environmental mobilization web platform engineered specifically for <strong>Sevadeep NGO</strong> in Pune, Maharashtra.
+    </p>
+    <p>
+      Unlike traditional static NGO brochures or government grievance portals that suffer from lack of transparency, CivicConnect bridges the gap between <strong>citizen grievance reporting</strong>, <strong>volunteer mobilization</strong>, <strong>coordinator triage</strong>, and <strong>municipal escalation with the Pune Municipal Corporation (PMC)</strong>.
+    </p>
+    <h3>Key Deliverables Completed:</h3>
+    <ul>
+      <li><strong>Full-Stack Architecture:</strong> React 18, Vite, and Tailwind CSS frontend coupled with a Node.js/Express REST API and MySQL 8.0 relational database with 11 tables.</li>
+      <li><strong>Geospatial Issue Reporting:</strong> Point-and-click OpenStreetMap picker centered on Pune with automatic landmark suggestions and photo uploads.</li>
+      <li><strong>Three-Tier Role-Based Access Control:</strong> Community Member (Citizen), Sevadeep Volunteer, and Sevadeep Coordinator / Admin.</li>
+      <li><strong>Dual Ground-Truth Resolution Loop:</strong> Coordinators verify and mark issues resolved, while the original citizen reporter verifies the on-ground outcome with a 1–5 star rating.</li>
+      <li><strong>Live Impact Telemetry:</strong> Real database aggregation of kilograms of waste collected, saplings planted, active volunteer hours, and PMC referral tracking.</li>
+    </ul>
+
+    <h2>2. Complete Technology Stack & Tooling</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Version</th>
+          <th>Purpose & Rationale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Frontend</strong></td>
+          <td>React</td>
+          <td>18.2.0</td>
+          <td>Declarative UI component architecture with Context and Hooks.</td>
+        </tr>
+        <tr>
+          <td><strong>Build Tool</strong></td>
+          <td>Vite</td>
+          <td>5.1.0</td>
+          <td>Sub-millisecond Hot Module Replacement (HMR) and optimized build.</td>
+        </tr>
+        <tr>
+          <td><strong>Styling</strong></td>
+          <td>Tailwind CSS</td>
+          <td>3.4.1</td>
+          <td>Utility-first responsive styling with custom Sevadeep green palette.</td>
+        </tr>
+        <tr>
+          <td><strong>Mapping</strong></td>
+          <td>Leaflet & React-Leaflet</td>
+          <td>1.9.4 / 4.2.1</td>
+          <td>Open-source OpenStreetMap integration without costly Google Maps API fees.</td>
+        </tr>
+        <tr>
+          <td><strong>Data Charts</strong></td>
+          <td>Recharts</td>
+          <td>2.12.0</td>
+          <td>Interactive SVG charts for monthly trends and category breakdowns.</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>Node.js & Express</td>
+          <td>20.x / 4.18.2</td>
+          <td>Fast, event-driven REST API with MVC modular architecture.</td>
+        </tr>
+        <tr>
+          <td><strong>Database</strong></td>
+          <td>MySQL Server</td>
+          <td>8.0</td>
+          <td>Relational database with 11 tables, foreign key constraints, and indexing.</td>
+        </tr>
+        <tr>
+          <td><strong>DB Driver</strong></td>
+          <td>mysql2/promise</td>
+          <td>3.9.1</td>
+          <td>High-performance connection pool with prepared statements.</td>
+        </tr>
+        <tr>
+          <td><strong>Auth & Security</strong></td>
+          <td>jsonwebtoken & bcryptjs</td>
+          <td>9.0.2 / 2.4.3</td>
+          <td>Stateless JWT token authentication and Blowfish salt password hashing.</td>
+        </tr>
+        <tr>
+          <td><strong>File Storage</strong></td>
+          <td>Multer</td>
+          <td>1.4.5</td>
+          <td>Multipart form-data handler with 5MB file size limit and MIME validation.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Database Design (11 Relational Tables)</h2>
+    <p>The database <code>sevadeep_civicconnect</code> contains 11 normalized tables with full referential integrity:</p>
+    <ul>
+      <li><code>users</code>: Registered accounts, hashed passwords, roles (citizen, volunteer, coordinator, admin), service hours, and points.</li>
+      <li><code>reports</code>: Grievance details, coordinates (lat/lng), status, category, severity, PMC docket reference, and citizen rating.</li>
+      <li><code>report_photographs</code>: Evidence photographs tagged as <em>initial</em>, <em>progress</em>, or <em>resolution</em>.</li>
+      <li><code>status_history</code>: Immutable audit timeline of every status transition with coordinator notes and timestamps.</li>
+      <li><code>community_confirmations</code>: Citizen upvotes preventing duplicate votes via composite primary keys.</li>
+      <li><code>comments</code>: Public discussion stream with coordinator moderation flags (<code>is_hidden</code>, <code>moderation_reason</code>).</li>
+      <li><code>events</code>: Community cleanup and tree plantation drives with volunteer slot limits and recorded impact metrics.</li>
+      <li><code>event_registrations</code>: Volunteer enrollments with verified attendance flags and service hours awarded.</li>
+      <li><code>volunteer_assignments</code>: Field assignments dispatched by coordinators.</li>
+      <li><code>notifications</code>: In-app alert queue for report approvals, task assignments, and resolution requests.</li>
+      <li><code>audit_logs</code>: Administrative action logs capturing actor ID, action type, IP address, and payload.</li>
+    </ul>
+
+    <h2>4. System Workflows</h2>
+    <h3>A. Issue Lifecycle</h3>
+    <pre><code>Submitted ──▶ Under Review ──▶ Approved ──▶ In Progress ──▶ Resolved ──▶ Citizen 1-5★ Rating
+     │               │
+     ▼               ▼
+Needs More Info   Rejected</code></pre>
+
+    <h3>B. Volunteer Community Event Flow</h3>
+    <pre><code>Coordinator creates event ──▶ Volunteer registers slot ──▶ On-ground activity
+                                                                    │
+Live Impact Counters Updated ◀── Coordinator marks completed & logs kg waste / trees</code></pre>
+
+    <h2>5. Feature Catalog & Step-by-Step Execution Guide</h2>
+
+    <div class="card">
+      <h3 style="margin-top: 0;">Evaluation Accounts (Password for all: <code>Password@123</code>)</h3>
+      <table style="margin-bottom: 0;">
+        <tr>
+          <th>Role</th>
+          <th>Email</th>
+          <th>Persona</th>
+        </tr>
+        <tr>
+          <td><span class="tag tag-green">Coordinator</span></td>
+          <td><code>coordinator@sevadeep.org</code></td>
+          <td>Dr. Ananya Joshi (Triage, review, volunteer dispatch)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-blue">Volunteer</span></td>
+          <td><code>volunteer@sevadeep.org</code></td>
+          <td>Aarav Kulkarni (Drive lead, field evidence upload)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">Citizen</span></td>
+          <td><code>citizen@sevadeep.org</code></td>
+          <td>Sunita Deshmukh (Grievance submission, outcome verification)</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>Step-by-Step Feature Walkthrough:</h3>
+    <ol>
+      <li><strong>Citizen Grievance Submission:</strong>
+        Log in as Citizen &rarr; Click <em>"Report an Issue"</em> &rarr; Fill in title, category, severity &rarr; Drop a pin on the Pune map &rarr; Attach photo &rarr; Submit. The system assigns a unique reference number (e.g., <code>SVD-2026-0010</code>).
+      </li>
+      <li><strong>Coordinator Triage & Approval:</strong>
+        Log in as Coordinator &rarr; Open <em>Admin Dashboard &rarr; Incoming Triage</em> &rarr; Click <em>"View & Triage"</em> &rarr; In the Coordinator Decision Panel at the top right, select <strong>"Approved (Public on Map)"</strong> &rarr; Click Save. The report is now visible on the public map.
+      </li>
+      <li><strong>Community Upvote & Discussion:</strong>
+        Browse as Citizen &rarr; Go to <em>Community Issues</em> &rarr; Click on the approved issue &rarr; Click <em>"Support / Confirm This Issue"</em> to increment the counter &rarr; Post an update comment in the discussion stream.
+      </li>
+      <li><strong>Marking Resolved (Coordinator) & Feedback (Citizen):</strong>
+        Log in as Coordinator &rarr; On the issue page, select <strong>"Resolved (Outcome Verified) ✅"</strong> &rarr; Enter resolution notes &rarr; Attach verified "after" photo &rarr; Save. Now switch back to Citizen: the <em>Reporter Resolution Feedback</em> widget appears to submit a 1–5 star rating and ground-truth verification!
+      </li>
+      <li><strong>Volunteer Drive Completion & Impact Logging:</strong>
+        Log in as Volunteer &rarr; Go to <em>Volunteer Activities</em> &rarr; Register for a drive &rarr; Switch to Coordinator &rarr; Open <em>Admin Activities</em> &rarr; Click <em>"Mark Completed & Log Impact"</em> &rarr; Input <code>520 kg</code> waste collected and <code>40</code> trees planted &rarr; Save. The public <em>Social Impact & Transparency</em> page updates immediately!
+      </li>
+    </ol>
+
+    <h2>6. Novelty & Distinctive Innovations</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Standard Civic / NGO Portals</th>
+          <th>Sevadeep CivicConnect Innovation</th>
+          <th>Real-World Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Unilateral Ticket Closure:</strong> Authorities close tickets without resident sign-off.</td>
+          <td><strong>Dual Ground-Truth Verification Loop:</strong> Coordinator signs off, but original reporter rates outcome (1–5 stars).</td>
+          <td>Prevents paper-only resolutions and fosters authentic trust.</td>
+        </tr>
+        <tr>
+          <td><strong>Static Annual PDF Reports:</strong> Metrics published once a year without live proof.</td>
+          <td><strong>Live Impact Telemetry:</strong> Real-time database aggregation of kg waste, trees planted, and volunteer hours.</td>
+          <td>Radical transparency for donors, citizens, and municipal partners.</td>
+        </tr>
+        <tr>
+          <td><strong>Black-Box Municipal Blame:</strong> Out-of-scope issues are dropped.</td>
+          <td><strong>Formal PMC Escalation Bridge:</strong> Issues requiring municipal equipment receive official PMC docket references tracked publicly.</td>
+          <td>Honest civic advocacy without claiming false credit or abandoning residents.</td>
+        </tr>
+        <tr>
+          <td><strong>Privacy Leaks:</strong> Phone numbers and exact house addresses exposed.</td>
+          <td><strong>Differential Privacy Redaction:</strong> General landmark coordinates only; phone numbers and home addresses completely shielded.</td>
+          <td>Protects citizen reporters from harassment or retaliation.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>7. Project Scope & Future Roadmap</h2>
+    <p><strong>Current Operational Footprint:</strong> Pune Metropolitan Region (Shivajinagar, Swargate, Kothrud, Deccan Gymkhana, Mandai, Vetal Tekdi, Kasba Peth, Hadapsar). Handles solid waste management, drinking water leakage, and public parks.</p>
+    <p><strong>Future Enhancements:</strong></p>
+    <ul>
+      <li>WhatsApp Business API bot integration for chat-based photo and location reporting.</li>
+      <li>AI computer vision model for automatic waste volume estimation and duplicate detection within 50 meters.</li>
+      <li>Automated two-way integration with the Pune Municipal Corporation (PMC) <em>Pune Connect</em> grievance API.</li>
+      <li>Progressive Web App (PWA) offline caching for volunteers operating on hill trails (Tekdis).</li>
+    </ul>
+
+    <h2>8. Social & Environmental Impact</h2>
+    <ul>
+      <li><strong>Empirical Environmental Metrics:</strong> Measures exact kilograms of plastics and debris cleared from riverbanks and hill slopes, producing actionable data for municipal policy.</li>
+      <li><strong>Community Solidarity:</strong> Confirmation upvotes empower neighborhoods to highlight chronic sanitation blackspots.</li>
+      <li><strong>Certified Volunteer Hours:</strong> Volunteers earn authenticated service credentials suitable for university credits and corporate CSR recognition.</li>
+      <li><strong>Data-Driven Civic Accountability:</strong> Chronic dumping heatmaps provide objective evidence for Ward Officers to install streetlights and waste containers.</li>
+    </ul>
+
+    <div class="card no-print" style="text-align: center; margin-top: 3rem;">
+      <p style="margin-bottom: 0.75rem;"><strong>Ready to download or print this documentation?</strong></p>
+      <button onclick="window.print()" class="btn btn-primary">
+        🖨️ Download / Print as PDF
+      </button>
+      <a href="Sevadeep_CivicConnect_Documentation.md" download class="btn btn-secondary" style="margin-left: 0.5rem;">
+        ⬇️ Download Markdown (.md)
+      </a>
+      <a href="sevadeep_civicconnect_dump.sql" download class="btn btn-secondary" style="margin-left: 0.5rem;">
+        💾 Download SQL Dump (.sql)
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

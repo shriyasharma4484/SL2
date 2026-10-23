@@ -1,7 +1,10 @@
 import React from 'react';
 import { Clock, CheckCircle, AlertCircle, RefreshCw, XCircle, HelpCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function StatusBadge({ status, className = '' }) {
+  const { translateStatus } = useLanguage();
+
   const configs = {
     'Submitted': {
       bg: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -33,6 +36,11 @@ export default function StatusBadge({ status, className = '' }) {
       icon: HelpCircle,
       label: 'Needs More Info'
     },
+    'Needs More Info': {
+      bg: 'bg-orange-50 text-orange-700 border-orange-200',
+      icon: HelpCircle,
+      label: 'Needs More Info'
+    },
     'Rejected': {
       bg: 'bg-rose-50 text-rose-700 border-rose-200',
       icon: XCircle,
@@ -47,13 +55,14 @@ export default function StatusBadge({ status, className = '' }) {
   };
 
   const IconComponent = config.icon;
+  const translatedLabel = translateStatus(status || config.label);
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${config.bg} ${className}`}
     >
       <IconComponent className="w-3.5 h-3.5" />
-      <span>{config.label}</span>
+      <span>{translatedLabel}</span>
     </span>
   );
 }

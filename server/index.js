@@ -12,6 +12,8 @@ import eventRoutes from './routes/eventRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import impactRoutes from './routes/impactRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import intelligenceRoutes from './routes/intelligenceRoutes.js';
+import civicOpsRoutes from './routes/civicOpsRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,6 +59,8 @@ app.use('/api/events', eventRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/impact', impactRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/intelligence', intelligenceRoutes);
+app.use('/api/civicops', civicOpsRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

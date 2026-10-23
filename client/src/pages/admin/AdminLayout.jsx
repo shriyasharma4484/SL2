@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import DemoBanner from '../../components/DemoBanner';
 import {
   LayoutDashboard,
+  BrainCircuit,
+  Compass,
   Inbox,
   CheckCircle,
   Clock,
@@ -22,30 +25,47 @@ import {
 } from 'lucide-react';
 
 export default function AdminLayout() {
-  const { user, logout, isCoordinator } = useAuth();
+  const { user, login, logout, isCoordinator } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
   // Guard: strictly enforce coordinator role on frontend as well
   if (!user || user.role !== 'coordinator') {
     return (
-      <div className="max-w-md mx-auto my-20 p-8 bg-white rounded-3xl border border-slate-200 text-center space-y-4 shadow-lg">
-        <Shield className="w-12 h-12 text-rose-600 mx-auto" />
-        <h2 className="text-xl font-bold text-slate-900">Coordinator Access Required</h2>
-        <p className="text-xs text-slate-600">
-          This administration console is restricted to verified Sevadeep coordinators.
-        </p>
-        <div className="pt-2 flex flex-col gap-2">
-          <Link
-            to="/login"
-            className="py-2.5 px-4 bg-emerald-700 text-white font-bold text-xs rounded-xl shadow"
-          >
-            Switch to Coordinator Demo Account
-          </Link>
-          <Link to="/" className="text-xs text-slate-500 hover:underline">
-            Return to Public Home
-          </Link>
+      <div className="min-h-screen bg-slate-100 flex flex-col">
+        <DemoBanner />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 text-center p-8 space-y-4 shadow-lg">
+            <Shield className="w-12 h-12 text-rose-600 mx-auto" />
+            <h2 className="text-xl font-bold text-slate-900">Coordinator Access Required</h2>
+            <p className="text-xs text-slate-600">
+              This administration console is restricted to verified Sevadeep coordinators. Click below to instantly log in as the default coordinator.
+            </p>
+            <div className="pt-2 flex flex-col gap-2">
+              <button
+                type="button"
+                disabled={switching}
+                onClick={async () => {
+                  setSwitching(true);
+                  try {
+                    await login('coordinator@sevadeep.org', 'Password@123');
+                  } catch (e) {
+                    console.error(e);
+                  } finally {
+                    setSwitching(false);
+                  }
+                }}
+                className="py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition-colors"
+              >
+                {switching ? 'Logging In...' : '1-Click Switch to Coordinator (Dr. Ananya Joshi)'}
+              </button>
+              <Link to="/" className="text-xs text-slate-500 hover:underline">
+                Return to Public Home
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -53,6 +73,8 @@ export default function AdminLayout() {
 
   const menuItems = [
     { name: 'Overview', path: '/admin', icon: LayoutDashboard },
+    { name: 'Impact Intelligence', path: '/admin/impact-intelligence', icon: BrainCircuit, badge: 'New' },
+    { name: 'CivicOps Dispatch', path: '/admin/civicops', icon: Compass, badge: 'AI Engine' },
     { name: 'Incoming Reports', path: '/admin/incoming', icon: Inbox },
     { name: 'Approved & Active', path: '/admin/active', icon: Clock },
     { name: 'Resolved Archive', path: '/admin/resolved', icon: CheckCheck },
@@ -128,6 +150,11 @@ export default function AdminLayout() {
                 >
                   <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-emerald-400'}`} />
                   <span className="flex-1">{item.name}</span>
+                  {item.badge && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-emerald-400 text-slate-950 uppercase tracking-wider">
+                      {item.badge}
+                    </span>
+                  )}
                   {active && <ChevronRight className="w-3.5 h-3.5 text-emerald-200" />}
                 </Link>
               );
@@ -169,9 +196,12 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col min-h-screen">
+        <DemoBanner />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

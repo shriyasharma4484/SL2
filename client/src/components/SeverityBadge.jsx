@@ -1,27 +1,30 @@
 import React from 'react';
 import { AlertTriangle, AlertCircle, Info, ShieldAlert } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function SeverityBadge({ severity, className = '' }) {
+  const { lang } = useLanguage();
+
   const configs = {
     'Critical': {
       bg: 'bg-red-50 text-red-700 border-red-200',
       icon: ShieldAlert,
-      label: 'Critical'
+      label: lang === 'mr' ? 'अतिगंभीर' : 'Critical'
     },
     'High': {
       bg: 'bg-orange-50 text-orange-700 border-orange-200',
       icon: AlertTriangle,
-      label: 'High Priority'
+      label: lang === 'mr' ? 'गंभीर' : 'High Priority'
     },
     'Medium': {
       bg: 'bg-yellow-50 text-yellow-700 border-yellow-200',
       icon: AlertCircle,
-      label: 'Medium'
+      label: lang === 'mr' ? 'मध्यम' : 'Medium'
     },
     'Low': {
       bg: 'bg-slate-50 text-slate-600 border-slate-200',
       icon: Info,
-      label: 'Low Priority'
+      label: lang === 'mr' ? 'कमी' : 'Low Priority'
     }
   };
 

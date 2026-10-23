@@ -103,4 +103,23 @@ export const notificationService = {
   markAllAsRead: () => api.patch('/notifications/read-all')
 };
 
+// Civic Impact Intelligence Engine
+export const intelligenceService = {
+  getMetrics: () => api.get('/intelligence/metrics'),
+  getLocations: (params) => api.get('/intelligence/locations', { params }),
+  getLocationById: (id) => api.get(`/intelligence/locations/${id}`),
+  createIntervention: (data) => api.post('/intelligence/interventions', data),
+  completeIntervention: (id, data) => api.patch(`/intelligence/interventions/${id}/complete`, data),
+  recordInspection: (data) => api.post('/intelligence/inspections', data)
+};
+
+// CivicOps — Intelligent Resource Allocation & Field Coordination Engine
+export const civicOpsService = {
+  getOverview: () => api.get('/civicops/overview'),
+  generatePlans: (data = {}) => api.post('/civicops/generate-plans', data),
+  simulateCancellation: (data) => api.post('/civicops/simulate-cancellation', data),
+  approvePlan: (data) => api.post('/civicops/approve-plan', data),
+  resetScenario: () => api.post('/civicops/reset')
+};
+
 export default api;

@@ -1,7 +1,10 @@
 import React from 'react';
 import { Trash2, Sparkles, Droplets, Wrench, Trees, HelpCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CategoryBadge({ category, className = '', showIcon = true }) {
+  const { translateCategory } = useLanguage();
+
   const configs = {
     'Garbage and Waste Management': {
       bg: 'bg-amber-100/70 text-amber-900 border-amber-300',
@@ -37,13 +40,14 @@ export default function CategoryBadge({ category, className = '', showIcon = tru
 
   const config = configs[category] || configs['Other Community Issues'];
   const IconComponent = config.icon;
+  const translatedLabel = translateCategory(category);
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${config.bg} ${className}`}
     >
       {showIcon && <IconComponent className="w-3.5 h-3.5 flex-shrink-0" />}
-      <span className="truncate">{category}</span>
+      <span className="truncate">{translatedLabel}</span>
     </span>
   );
 }

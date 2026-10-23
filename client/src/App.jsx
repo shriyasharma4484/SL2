@@ -32,6 +32,8 @@ import AdminActivitiesPage from './pages/admin/AdminActivitiesPage';
 import AdminModerationPage from './pages/admin/AdminModerationPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminImpactIntelligencePage from './pages/admin/AdminImpactIntelligencePage';
+import AdminCivicOpsPage from './pages/admin/AdminCivicOpsPage';
 
 function PublicLayout({ children }) {
   return (
@@ -60,6 +62,8 @@ export default function App() {
             <Route path="/issues/:id" element={<PublicLayout><IssueDetailPage /></PublicLayout>} />
             <Route path="/activities" element={<PublicLayout><ActivitiesPage /></PublicLayout>} />
             <Route path="/impact" element={<PublicLayout><ImpactPage /></PublicLayout>} />
+            <Route path="/impact-intelligence" element={<PublicLayout><AdminImpactIntelligencePage /></PublicLayout>} />
+            <Route path="/civicops" element={<PublicLayout><AdminCivicOpsPage /></PublicLayout>} />
             <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
             <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
             <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
@@ -70,6 +74,8 @@ export default function App() {
             {/* Admin Coordinator Protected Routes */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminOverviewPage />} />
+              <Route path="impact-intelligence" element={<AdminImpactIntelligencePage />} />
+              <Route path="civicops" element={<AdminCivicOpsPage />} />
               <Route path="incoming" element={<AdminIncomingReportsPage />} />
               <Route path="active" element={<AdminIncomingReportsPage />} />
               <Route path="resolved" element={<AdminOverviewPage />} />

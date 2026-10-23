@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { issueService } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import LeafletMap from '../components/LeafletMap';
 import StatusBadge from '../components/StatusBadge';
 import CategoryBadge from '../components/CategoryBadge';
@@ -32,10 +33,9 @@ const CATEGORIES = [
   'Other Community Issues'
 ];
 
-const STATUSES = ['All', 'Approved', 'In Progress', 'Resolved'];
-
 export default function IssuesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t, lang, translateCategory, translateStatus } = useLanguage();
 
   const [issues, setIssues] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12, totalPages: 1 });
@@ -105,13 +105,15 @@ export default function IssuesPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-            Public Civic Ledger
+            {lang === 'mr' ? 'सार्वजनिक नागरी नोंदवही' : 'Public Civic Ledger'}
           </span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-            Community Reports & Issue Map
+            {lang === 'mr' ? 'नागरी तक्रारी व नकाशा' : 'Community Reports & Issue Map'}
           </h1>
           <p className="text-slate-600 text-xs sm:text-sm mt-0.5">
-            Explore approved community problems across Pune neighborhoods, confirm active issues, and follow progress.
+            {lang === 'mr'
+              ? 'पुणे परिसरातील मंजूर समस्या शोधा, सक्रिय तक्रारींना पाठिंबा द्या आणि कामाची प्रगती तपासा.'
+              : 'Explore approved community problems across Pune neighborhoods, confirm active issues, and follow progress.'}
           </p>
         </div>
 
@@ -119,30 +121,30 @@ export default function IssuesPage() {
         <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 self-start md:self-auto">
           <button
             onClick={() => setViewMode('split')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
               viewMode === 'split' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Split View</span>
+            <span className="hidden sm:inline">{lang === 'mr' ? 'विभाजित दृश्य' : 'Split View'}</span>
           </button>
           <button
             onClick={() => setViewMode('grid')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
               viewMode === 'grid' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Grid Only</span>
+            <span className="hidden sm:inline">{lang === 'mr' ? 'ग्रिड सूची' : 'Grid Only'}</span>
           </button>
           <button
             onClick={() => setViewMode('map')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
               viewMode === 'map' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <MapIcon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Map Only</span>
+            <span className="hidden sm:inline">{lang === 'mr' ? 'केवळ नकाशा' : 'Map Only'}</span>
           </button>
         </div>
       </div>
@@ -157,7 +159,7 @@ export default function IssuesPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by title, location (e.g. FC Road, Mandai, Deccan) or reference code..."
+              placeholder={lang === 'mr' ? 'शीर्षक, पत्ता (उदा. फर्ग्युसन रस्ता, मंडई, डेक्कन) किंवा संदर्भ क्रमांकाने शोधा...' : 'Search by title, location (e.g. FC Road, Mandai, Deccan) or reference code...'}
               className="w-full pl-10 pr-4 py-2.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-hidden"
             />
           </form>
@@ -169,10 +171,10 @@ export default function IssuesPage() {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 outline-hidden bg-white"
             >
-              <option value="All">All Statuses</option>
-              <option value="Approved">Approved</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
+              <option value="All">{lang === 'mr' ? 'सर्व स्थिती' : 'All Statuses'}</option>
+              <option value="Approved">{lang === 'mr' ? 'मंजूर' : 'Approved'}</option>
+              <option value="In Progress">{lang === 'mr' ? 'काम सुरू आहे' : 'In Progress'}</option>
+              <option value="Resolved">{lang === 'mr' ? 'निकाली काढले' : 'Resolved'}</option>
             </select>
 
             {/* Sort Select */}
@@ -181,9 +183,9 @@ export default function IssuesPage() {
               onChange={(e) => setSortBy(e.target.value)}
               className="text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-600 outline-hidden bg-white"
             >
-              <option value="newest">Sort: Newest First</option>
-              <option value="oldest">Sort: Oldest First</option>
-              <option value="priority">Sort: Priority / Severity</option>
+              <option value="newest">{lang === 'mr' ? 'क्रम: नवीन प्रथम' : 'Sort: Newest First'}</option>
+              <option value="oldest">{lang === 'mr' ? 'क्रम: जुने प्रथम' : 'Sort: Oldest First'}</option>
+              <option value="priority">{lang === 'mr' ? 'क्रम: निकड/प्राधान्य' : 'Sort: Priority / Severity'}</option>
             </select>
           </div>
         </div>
@@ -192,19 +194,19 @@ export default function IssuesPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
           <span className="text-slate-400 text-xs font-semibold mr-1 flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" />
-            <span>Category:</span>
+            <span>{lang === 'mr' ? 'श्रेणी:' : 'Category:'}</span>
           </span>
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => handleCategoryClick(cat)}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition-all cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-emerald-700 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {cat}
+              {cat === 'All' ? (lang === 'mr' ? 'सर्व श्रेणी' : 'All') : translateCategory(cat)}
             </button>
           ))}
         </div>
@@ -214,8 +216,8 @@ export default function IssuesPage() {
       {viewMode === 'map' ? (
         <div className="space-y-4">
           <div className="bg-emerald-50 text-emerald-900 border border-emerald-200 px-4 py-2 rounded-xl text-xs flex items-center justify-between">
-            <span>Showing {issues.length} approved issues on Pune OpenStreetMap</span>
-            <span className="font-semibold text-emerald-800">Click any marker to inspect</span>
+            <span>{lang === 'mr' ? `पुणे नकाशावर ${issues.length} मंजूर समस्या दर्शवित आहे` : `Showing ${issues.length} approved issues on Pune OpenStreetMap`}</span>
+            <span className="font-semibold text-emerald-800">{lang === 'mr' ? 'तपशीलासाठी मार्करवर क्लिक करा' : 'Click any marker to inspect'}</span>
           </div>
           <LeafletMap issues={issues} height="650px" />
         </div>
@@ -224,8 +226,8 @@ export default function IssuesPage() {
           {/* Left Column: Interactive Map */}
           <div className="lg:col-span-5 sticky top-24 space-y-2">
             <div className="flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
-              <span>Interactive Pune Map</span>
-              <span className="text-emerald-700">{issues.length} Locations</span>
+              <span>{lang === 'mr' ? 'परिसर नकाशा' : 'Interactive Pune Map'}</span>
+              <span className="text-emerald-700">{issues.length} {lang === 'mr' ? 'ठिकाणे' : 'Locations'}</span>
             </div>
             <LeafletMap issues={issues} selectedIssue={selectedIssueForMap} height="560px" />
           </div>
@@ -233,20 +235,26 @@ export default function IssuesPage() {
           {/* Right Column: Cards List */}
           <div className="lg:col-span-7 space-y-4">
             <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>Found <strong>{pagination.total}</strong> approved community reports</span>
-              <span>Page {pagination.page} of {pagination.totalPages}</span>
+              <span>
+                {lang === 'mr' ? `एकूण ` : `Found `}
+                <strong>{pagination.total}</strong>
+                {lang === 'mr' ? ` मंजूर नागरी तक्रारी सापडल्या` : ` approved community reports`}
+              </span>
+              <span>
+                {lang === 'mr' ? `पृष्ठ ${pagination.page} / ${pagination.totalPages}` : `Page ${pagination.page} of ${pagination.totalPages}`}
+              </span>
             </div>
 
             {loading ? (
               <div className="py-20 text-center text-slate-400 text-xs">
-                Loading community reports...
+                {t('loadingReports')}
               </div>
             ) : issues.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 space-y-3">
                 <Search className="w-8 h-8 text-slate-400 mx-auto" />
-                <h3 className="font-bold text-slate-800 text-sm">No Matching Reports Found</h3>
+                <h3 className="font-bold text-slate-800 text-sm">{lang === 'mr' ? 'कोणतीही तक्रार आढळली नाही' : 'No Matching Reports Found'}</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Try clearing search filters or search a different neighborhood in Pune.
+                  {lang === 'mr' ? 'कृपया शोध शब्द तपासा किंवा वेगळा परिसर निवडा.' : 'Try clearing search filters or search a different neighborhood in Pune.'}
                 </p>
               </div>
             ) : (
@@ -256,6 +264,8 @@ export default function IssuesPage() {
                     key={issue.id}
                     issue={issue}
                     onHighlight={() => setSelectedIssueForMap(issue)}
+                    lang={lang}
+                    t={t}
                   />
                 ))}
               </div>
@@ -267,7 +277,7 @@ export default function IssuesPage() {
                 <button
                   disabled={pagination.page <= 1}
                   onClick={() => fetchIssues(pagination.page - 1)}
-                  className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs"
+                  className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -277,7 +287,7 @@ export default function IssuesPage() {
                 <button
                   disabled={pagination.page >= pagination.totalPages}
                   onClick={() => fetchIssues(pagination.page + 1)}
-                  className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs"
+                  className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -289,22 +299,28 @@ export default function IssuesPage() {
         /* Grid Only View */
         <div className="space-y-6">
           <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>Showing <strong>{pagination.total}</strong> community reports</span>
-            <span>Page {pagination.page} of {pagination.totalPages}</span>
+            <span>
+              {lang === 'mr' ? `दर्शवित आहे: ` : `Showing `}
+              <strong>{pagination.total}</strong>
+              {lang === 'mr' ? ` तक्रारी` : ` community reports`}
+            </span>
+            <span>
+              {lang === 'mr' ? `पृष्ठ ${pagination.page} / ${pagination.totalPages}` : `Page ${pagination.page} of ${pagination.totalPages}`}
+            </span>
           </div>
 
           {loading ? (
             <div className="py-20 text-center text-slate-400 text-xs">
-              Loading community reports...
+              {t('loadingReports')}
             </div>
           ) : issues.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
-              No reports match your selected criteria.
+              {lang === 'mr' ? 'कोणतीही तक्रार आढळली नाही.' : 'No reports match your selected criteria.'}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {issues.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
+                <IssueCard key={issue.id} issue={issue} lang={lang} t={t} />
               ))}
             </div>
           )}
@@ -314,7 +330,7 @@ export default function IssuesPage() {
               <button
                 disabled={pagination.page <= 1}
                 onClick={() => fetchIssues(pagination.page - 1)}
-                className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs"
+                className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -324,7 +340,7 @@ export default function IssuesPage() {
               <button
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => fetchIssues(pagination.page + 1)}
-                className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs"
+                className="p-2 rounded-lg border border-slate-200 disabled:opacity-40 hover:bg-slate-50 text-xs cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -336,7 +352,7 @@ export default function IssuesPage() {
   );
 }
 
-function IssueCard({ issue, onHighlight }) {
+function IssueCard({ issue, onHighlight, lang, t }) {
   return (
     <div
       onMouseEnter={onHighlight}
@@ -396,10 +412,10 @@ function IssueCard({ issue, onHighlight }) {
 
           <Link
             to={`/issues/${issue.id}`}
-            className="font-bold text-emerald-700 hover:text-emerald-900 text-xs flex items-center gap-1"
+            className="font-bold text-emerald-700 hover:text-emerald-900 text-xs flex items-center gap-1 cursor-pointer"
           >
-            <span>View Details</span>
-            <ArrowRight className="w-3 h-3" />
+            <span>{t ? t('details') : (lang === 'mr' ? 'तपशील पहा' : 'View Details')}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

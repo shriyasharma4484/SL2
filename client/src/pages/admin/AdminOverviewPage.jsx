@@ -15,7 +15,8 @@ import {
   Layers,
   Shield,
   Loader2,
-  Leaf
+  Leaf,
+  BrainCircuit
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -75,6 +76,29 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Civic Impact Intelligence Engine Banner */}
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white rounded-3xl p-6 shadow-md border border-emerald-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1 max-w-2xl">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
+            <BrainCircuit className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Civic Impact Intelligence Active</span>
+          </div>
+          <h3 className="font-extrabold text-base text-white">
+            From Recurring Problem Detection to Lasting Resolution
+          </h3>
+          <p className="text-xs text-slate-300">
+            Track whether chronic civic problems in Pune remain solved sustainably. Monitor 12 recurring locations, 4 follow-ups due, and verified intervention histories.
+          </p>
+        </div>
+        <Link
+          to="/admin/impact-intelligence"
+          className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 flex-shrink-0"
+        >
+          <span>Launch Impact Intelligence</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

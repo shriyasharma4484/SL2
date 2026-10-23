@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { eventService } from '../services/api';
 import {
   Calendar,
@@ -28,6 +29,7 @@ const CATEGORIES = [
 
 export default function ActivitiesPage() {
   const { user, isAuthenticated, isCoordinator } = useAuth();
+  const { t, lang, translateCategory } = useLanguage();
   const navigate = useNavigate();
 
   const [events, setEvents] = useState([]);
@@ -72,15 +74,40 @@ export default function ActivitiesPage() {
       } else {
         const res = await eventService.register(event.id);
         if (res.data.success) {
-          alert(res.data.message);
+          alert(lang === 'mr' ? 'उपक्रमासाठी तुमची नोंदणी यशस्वी झाली!' : res.data.message);
           fetchEvents();
         }
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Registration failed.');
+      alert(err.response?.data?.message || (lang === 'mr' ? 'नोंदणी अयशस्वी ठरली.' : 'Registration failed.'));
     } finally {
       setRegisteringId(null);
     }
+  };
+
+  const getCategoryLabel = (cat) => {
+    if (lang === 'mr') {
+      const map = {
+        'All': 'सर्व उपक्रम',
+        'Cleanliness Drive': 'स्वच्छता मोहीम',
+        'Tree Plantation': 'वृक्षारोपण',
+        'Lake Restoration': 'जलसंधारण व तलाव स्वच्छता',
+        'Waste Collection': 'कचरा संकलन व वर्गीकरण',
+        'Environmental Awareness': 'पर्यावरण जनजागृती',
+        'Other Community Service': 'इतर नागरी सेवा'
+      };
+      return map[cat] || cat;
+    }
+    return cat;
+  };
+
+  const getStatusLabel = (st) => {
+    if (lang === 'mr') {
+      if (st === 'Upcoming') return 'आगामी';
+      if (st === 'Completed') return 'पूर्ण झालेले';
+      return 'सर्व';
+    }
+    return st;
   };
 
   return (
@@ -89,23 +116,25 @@ export default function ActivitiesPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-            Grassroots Mobilization
+            {lang === 'mr' ? 'तळागाळातील लोकसहभाग' : 'Grassroots Mobilization'}
           </span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-            Community Service & Volunteer Activities
+            {lang === 'mr' ? 'नागरी सेवा आणि स्वयंसेवक उपक्रम' : 'Community Service & Volunteer Activities'}
           </h1>
           <p className="text-slate-600 text-xs sm:text-sm mt-0.5">
-            Participate in Sevadeep cleanliness drives, native tree plantations, and environmental missions across Pune.
+            {lang === 'mr'
+              ? 'पुण्यातील सेवादीप स्वच्छता मोहिमा, वृक्षारोपण आणि जलसंधारण उपक्रमांमध्ये सक्रिय सहभागी व्हा.'
+              : 'Participate in Sevadeep cleanliness drives, native tree plantations, and environmental missions across Pune.'}
           </p>
         </div>
 
         {isCoordinator && (
           <Link
             to="/admin/activities"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors self-start md:self-auto"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors self-start md:self-auto cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Manage / Create Activity</span>
+            <span>{lang === 'mr' ? 'नवीन उपक्रम तयार करा' : 'Manage / Create Activity'}</span>
           </Link>
         )}
       </div>
@@ -119,20 +148,20 @@ export default function ActivitiesPage() {
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedStatus === status
                     ? 'bg-emerald-700 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                {status} Activities
+                {getStatusLabel(status)} {lang === 'mr' ? 'उपक्रम' : 'Activities'}
               </button>
             ))}
           </div>
 
           {/* Category Dropdown */}
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-500 font-medium">Category:</span>
+            <span className="text-slate-500 font-medium">{lang === 'mr' ? 'प्रकार:' : 'Category:'}</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -140,7 +169,7 @@ export default function ActivitiesPage() {
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat}
+                  {getCategoryLabel(cat)}
                 </option>
               ))}
             </select>
@@ -151,14 +180,14 @@ export default function ActivitiesPage() {
       {/* Activities Grid */}
       {loading ? (
         <div className="py-20 text-center text-slate-400 text-xs">
-          Loading Sevadeep community activities...
+          {lang === 'mr' ? 'उपक्रम लोड होत आहेत...' : 'Loading Sevadeep community activities...'}
         </div>
       ) : events.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-3">
           <Calendar className="w-10 h-10 text-slate-400 mx-auto" />
-          <h3 className="font-bold text-slate-800 text-base">No Activities Found</h3>
+          <h3 className="font-bold text-slate-800 text-base">{lang === 'mr' ? 'कोणतेही उपक्रम आढळले नाहीत' : 'No Activities Found'}</h3>
           <p className="text-xs text-slate-500">
-            There are no {selectedStatus.toLowerCase()} activities matching this category.
+            {lang === 'mr' ? 'या श्रेणीत सध्या कोणतेही उपक्रम उपलब्ध नाहीत.' : `There are no ${selectedStatus.toLowerCase()} activities matching this category.`}
           </p>
         </div>
       ) : (
@@ -177,7 +206,7 @@ export default function ActivitiesPage() {
                     onError={(e) => { e.target.src = '/assets/drive_cleanliness_1.jpeg'; }}
                   />
                   <div className="absolute top-3 left-3 bg-emerald-800 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                    {ev.category}
+                    {getCategoryLabel(ev.category)}
                   </div>
                   <div className="absolute top-3 right-3">
                     <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase shadow-xs ${
@@ -185,7 +214,7 @@ export default function ActivitiesPage() {
                         ? 'bg-teal-100 text-teal-900 border border-teal-300'
                         : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                     }`}>
-                      {ev.status}
+                      {getStatusLabel(ev.status)}
                     </span>
                   </div>
                 </div>
@@ -204,7 +233,7 @@ export default function ActivitiesPage() {
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-emerald-700 flex-shrink-0" />
                       <span className="font-semibold text-slate-800">
-                        {new Date(ev.event_date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        {new Date(ev.event_date).toLocaleDateString(lang === 'mr' ? 'mr-IN' : 'en-IN', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -222,11 +251,11 @@ export default function ActivitiesPage() {
                     <div className="p-3 bg-teal-50 rounded-xl border border-teal-200 text-xs text-teal-950 space-y-1">
                       <p className="font-bold flex items-center gap-1.5 text-teal-800">
                         <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Completed Outcome</span>
+                        <span>{lang === 'mr' ? 'पूर्ण झालेले काम व फलनिष्पत्ती' : 'Completed Outcome'}</span>
                       </p>
                       <p className="text-[11px] text-teal-900">
-                        {ev.waste_collected_kg > 0 && `♻️ ${ev.waste_collected_kg} kg waste collected. `}
-                        {ev.trees_planted > 0 && `🌱 ${ev.trees_planted} native saplings planted. `}
+                        {ev.waste_collected_kg > 0 && `♻️ ${ev.waste_collected_kg} kg ${lang === 'mr' ? 'कचरा संकलित.' : 'waste collected. '} `}
+                        {ev.trees_planted > 0 && `🌱 ${ev.trees_planted} ${lang === 'mr' ? 'झाडे लावली.' : 'native saplings planted. '} `}
                         {ev.completion_summary}
                       </p>
                     </div>
@@ -239,10 +268,10 @@ export default function ActivitiesPage() {
                 <div className="text-xs text-slate-500">
                   {ev.status === 'Upcoming' ? (
                     <span>
-                      Slots: <strong className="text-emerald-700">{ev.available_slots}</strong> left
+                      {lang === 'mr' ? 'शिल्लक जागा:' : 'Slots:'} <strong className="text-emerald-700">{ev.available_slots}</strong>
                     </span>
                   ) : (
-                    <span className="text-teal-700 font-semibold">Drive Completed</span>
+                    <span className="text-teal-700 font-semibold">{lang === 'mr' ? 'मोहीम यशस्वीरित्या संपन्न' : 'Drive Completed'}</span>
                   )}
                 </div>
 
@@ -251,7 +280,7 @@ export default function ActivitiesPage() {
                     type="button"
                     onClick={() => handleRegisterToggle(ev)}
                     disabled={registeringId === ev.id}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs ${
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer ${
                       ev.is_user_registered
                         ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-300'
                         : 'bg-emerald-700 text-white hover:bg-emerald-800'
@@ -260,17 +289,17 @@ export default function ActivitiesPage() {
                     {registeringId === ev.id ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : ev.is_user_registered ? (
-                      <span>Cancel Registration</span>
+                      <span>{lang === 'mr' ? 'नोंदणी रद्द करा' : 'Cancel Registration'}</span>
                     ) : (
-                      <span>Register to Volunteer</span>
+                      <span>{lang === 'mr' ? 'स्वयंसेवक म्हणून नाव नोंदवा' : 'Register to Volunteer'}</span>
                     )}
                   </button>
                 ) : (
                   <Link
                     to={`/impact`}
-                    className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1"
+                    className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    <span>View in Impact Ledger</span>
+                    <span>{lang === 'mr' ? 'सामाजिक प्रभाव अहवालात पहा' : 'View in Impact Ledger'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 )}
