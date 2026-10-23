@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { initCivicOpsDatabase } from './initCivicOps.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,24 +12,50 @@ const __dirname = path.dirname(__filename);
 // Load env from server directory
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Shriya@26',
-  multipleStatements: true
-};
+const uri = process.env.MYSQL_URL || process.env.DATABASE_URL;
+const DB_NAME = process.env.DB_NAME || process.env.MYSQLDATABASE || 'sevadeep_civicconnect';
 
-const DB_NAME = process.env.DB_NAME || 'sevadeep_civicconnect';
+const isCloudUri = uri && (
+  process.env.DB_SSL === 'true' ||
+  uri.includes('tidbcloud') ||
+  uri.includes('aivencloud') ||
+  uri.includes('clever-cloud') ||
+  uri.includes('railway') ||
+  uri.includes('ssl=')
+);
+
+const sslConfig = (isCloudUri || process.env.DB_SSL === 'true') ? { rejectUnauthorized: false } : undefined;
 
 export async function initializeDatabase() {
-  console.log('[DB Init] Connecting to MySQL server at', dbConfig.host, '...');
+  console.log('[DB Init] Connecting to MySQL server for initialization...');
   let connection;
   try {
-    connection = await mysql.createConnection(dbConfig);
-    console.log(`[DB Init] Connected. Ensuring database '${DB_NAME}' exists...`);
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
-    await connection.query(`USE \`${DB_NAME}\`;`);
+    if (uri) {
+      connection = await mysql.createConnection({
+        uri,
+        multipleStatements: true,
+        ssl: sslConfig
+      });
+    } else {
+      connection = await mysql.createConnection({
+        host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10),
+        user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
+        password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : (process.env.MYSQLPASSWORD || 'Shriya@26'),
+        database: DB_NAME,
+        multipleStatements: true,
+        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
+      });
+    }
+
+    console.log(`[DB Init] Connected. Ensuring database '${DB_NAME}' schema is prepared...`);
+    try {
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
+      await connection.query(`USE \`${DB_NAME}\`;`);
+    } catch (e) {
+      // In restricted managed cloud databases (e.g. Railway), CREATE DATABASE or USE might be disallowed because the connection is already bound to the assigned database
+      console.log(`[DB Init] Note: Operating in assigned cloud database context (${DB_NAME}).`);
+    }
 
     // Read and execute schema.sql
     const schemaSql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf-8');
@@ -44,6 +71,15 @@ export async function initializeDatabase() {
       console.log('[DB Init] Demo data seeded successfully!');
     } else {
       console.log(`[DB Init] Database already contains ${existingUsers[0].count} users. Skipping seed.`);
+    }
+
+    // Initialize CivicOps (Feature 2) tables and Pune tasks/volunteers
+    try {
+      console.log('[DB Init] Initializing CivicOps resources and deployment models...');
+      await initCivicOpsDatabase(connection);
+      console.log('[DB Init] CivicOps tables verified.');
+    } catch (opsErr) {
+      console.warn('[DB Init Warning] CivicOps init warning:', opsErr.message);
     }
 
     return true;

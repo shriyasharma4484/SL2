@@ -2,17 +2,44 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306', 10),
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'Shriya@26',
-  database: process.env.DB_NAME || 'sevadeep_civicconnect',
-  multipleStatements: true
-};
+const uri = process.env.MYSQL_URL || process.env.DATABASE_URL;
 
-export async function initCivicOpsDatabase() {
-  const connection = await mysql.createConnection(dbConfig);
+const isCloudUri = uri && (
+  process.env.DB_SSL === 'true' ||
+  uri.includes('tidbcloud') ||
+  uri.includes('aivencloud') ||
+  uri.includes('clever-cloud') ||
+  uri.includes('railway') ||
+  uri.includes('ssl=')
+);
+
+const sslConfig = (isCloudUri || process.env.DB_SSL === 'true') ? { rejectUnauthorized: false } : undefined;
+
+export async function initCivicOpsDatabase(existingConn = null) {
+  let connection = existingConn;
+  let shouldClose = false;
+
+  if (!connection) {
+    shouldClose = true;
+    if (uri) {
+      connection = await mysql.createConnection({
+        uri,
+        multipleStatements: true,
+        ssl: sslConfig
+      });
+    } else {
+      connection = await mysql.createConnection({
+        host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10),
+        user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
+        password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : (process.env.MYSQLPASSWORD || 'Shriya@26'),
+        database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'sevadeep_civicconnect',
+        multipleStatements: true,
+        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
+      });
+    }
+  }
+
   console.log('[CivicOps Init] Connected to MySQL...');
 
   const schema = `
@@ -143,11 +170,13 @@ export async function initCivicOpsDatabase() {
     }
   }
 
-  connection.end();
+  if (shouldClose) {
+    await connection.end();
+  }
   console.log('[CivicOps Init] Database setup completed successfully!');
 }
 
-if (process.argv[1].endsWith('initCivicOps.js')) {
+if (process.argv[1] && process.argv[1].endsWith('initCivicOps.js')) {
   initCivicOpsDatabase().then(() => process.exit(0)).catch(err => {
     console.error(err);
     process.exit(1);

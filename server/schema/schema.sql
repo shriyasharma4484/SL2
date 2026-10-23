@@ -1,8 +1,6 @@
 -- Sevadeep CivicConnect Database Schema
 -- Custom-built for Sevadeep NGO, Pune, Maharashtra
-
-CREATE DATABASE IF NOT EXISTS sevadeep_civicconnect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE sevadeep_civicconnect;
+-- (Tables will be created in the currently connected database)
 
 -- 1. Users Table
 CREATE TABLE IF NOT EXISTS users (

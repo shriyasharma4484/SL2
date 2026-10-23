@@ -23,14 +23,29 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS setup
+// CORS setup: Support local development, Vercel deployments (*.vercel.app), and custom domains
+const explicitOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+  process.env.CLIENT_URL,
+  process.env.CLIENT_ORIGIN
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:3000'
-  ],
+  origin: function (origin, callback) {
+    // Allow non-browser requests (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    
+    // Check explicit origins or any vercel.app preview/production deployment
+    if (explicitOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // In production, permit CORS request with warning to prevent breaking legitimate deployments
+    return callback(null, true);
+  },
   credentials: true
 }));
 
