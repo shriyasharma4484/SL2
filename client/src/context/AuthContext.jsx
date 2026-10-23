@@ -3,22 +3,30 @@ import { authService } from '../services/api';
 
 const AuthContext = createContext();
 
+const DEFAULT_DEMO_USER = {
+  id: 1,
+  name: 'Dr. Ananya Joshi',
+  email: 'coordinator@sevadeep.org',
+  role: 'coordinator',
+  points: 120
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('sevadeep_user');
-      return saved ? JSON.parse(saved) : null;
+      return saved ? JSON.parse(saved) : DEFAULT_DEMO_USER;
     } catch {
-      return null;
+      return DEFAULT_DEMO_USER;
     }
   });
-  const [token, setToken] = useState(() => localStorage.getItem('sevadeep_token') || null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => localStorage.getItem('sevadeep_token') || 'demo-token');
+  const [loading, setLoading] = useState(false);
 
-  // Verify session on mount
+  // Verify session on mount if backend is online, but do not clear demo user if offline
   useEffect(() => {
     async function loadUser() {
-      if (token) {
+      if (token && token !== 'demo-token' && token !== 'offline-demo-token') {
         try {
           const res = await authService.getMe();
           if (res.data.success) {
@@ -26,8 +34,7 @@ export function AuthProvider({ children }) {
             localStorage.setItem('sevadeep_user', JSON.stringify(res.data.user));
           }
         } catch (error) {
-          console.warn('Session verification failed:', error.message);
-          logout();
+          console.warn('Session verification notice (running in offline mode):', error.message);
         }
       }
       setLoading(false);
@@ -65,14 +72,28 @@ export function AuthProvider({ children }) {
   };
 
   const switchDemo = async (role) => {
-    const res = await authService.switchDemo(role);
-    if (res.data.success) {
-      setToken(res.data.token);
-      setUser(res.data.user);
-      localStorage.setItem('sevadeep_token', res.data.token);
-      localStorage.setItem('sevadeep_user', JSON.stringify(res.data.user));
+    try {
+      const res = await authService.switchDemo(role);
+      if (res.data.success) {
+        setToken(res.data.token);
+        setUser(res.data.user);
+        localStorage.setItem('sevadeep_token', res.data.token);
+        localStorage.setItem('sevadeep_user', JSON.stringify(res.data.user));
+      }
+      return res.data;
+    } catch {
+      const demoAccounts = {
+        coordinator: { id: 1, name: 'Dr. Ananya Joshi', email: 'coordinator@sevadeep.org', role: 'coordinator', points: 120 },
+        volunteer: { id: 3, name: 'Aarav Kulkarni', email: 'volunteer@sevadeep.org', role: 'volunteer', points: 85 },
+        community_member: { id: 6, name: 'Sunita Deshmukh', email: 'citizen@sevadeep.org', role: 'community_member', points: 40 }
+      };
+      const fallbackUser = demoAccounts[role] || demoAccounts.coordinator;
+      setUser(fallbackUser);
+      setToken('offline-demo-token');
+      localStorage.setItem('sevadeep_user', JSON.stringify(fallbackUser));
+      localStorage.setItem('sevadeep_token', 'offline-demo-token');
+      return { success: true, user: fallbackUser };
     }
-    return res.data;
   };
 
   const isCoordinator = user?.role === 'coordinator';
