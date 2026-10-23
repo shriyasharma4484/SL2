@@ -18,7 +18,8 @@ import {
   LogOut,
   ArrowLeft,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -60,6 +61,7 @@ export default function AdminLayout() {
     { name: 'Community Activities', path: '/admin/activities', icon: Calendar },
     { name: 'Comments & Moderation', path: '/admin/moderation', icon: MessageSquare },
     { name: 'Analytics & Charts', path: '/admin/analytics', icon: BarChart3 },
+    { name: 'Impact Intelligence', path: '/admin/intelligence', icon: Sparkles },
     { name: 'Audit Logs & Settings', path: '/admin/settings', icon: Settings },
   ];
 

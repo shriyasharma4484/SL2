@@ -16,6 +16,7 @@ import IssuesPage from './pages/IssuesPage';
 import IssueDetailPage from './pages/IssueDetailPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import ImpactPage from './pages/ImpactPage';
+import ImpactIntelligencePage from './pages/ImpactIntelligencePage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="/issues/:id" element={<PublicLayout><IssueDetailPage /></PublicLayout>} />
             <Route path="/activities" element={<PublicLayout><ActivitiesPage /></PublicLayout>} />
             <Route path="/impact" element={<PublicLayout><ImpactPage /></PublicLayout>} />
+            <Route path="/impact-intelligence" element={<PublicLayout><ImpactIntelligencePage /></PublicLayout>} />
             <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
             <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
             <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
@@ -77,6 +79,7 @@ export default function App() {
               <Route path="activities" element={<AdminActivitiesPage />} />
               <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="analytics" element={<AdminAnalyticsPage />} />
+              <Route path="intelligence" element={<ImpactIntelligencePage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
 

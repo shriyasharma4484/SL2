@@ -16,7 +16,8 @@ import {
   ExternalLink,
   Info,
   Scale,
-  FileText
+  FileText,
+  Sparkles
 } from 'lucide-react';
 
 export default function ImpactPage() {
@@ -58,8 +59,16 @@ export default function ImpactPage() {
           Sevadeep NGO believes in complete civic transparency. Here you can inspect verified outcomes, before-and-after physical evidence, and our municipal escalation bridge with Pune Municipal Corporation (PMC).
         </p>
 
-        {/* CSR Impact Brief Export Button */}
-        <div className="pt-2 flex justify-center">
+        {/* CSR Impact Brief Export Button & Intelligence Engine */}
+        <div className="pt-2 flex flex-wrap justify-center gap-3">
+          <Link
+            to="/impact-intelligence"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-forest-dark hover:bg-slate-900 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 cursor-pointer border border-emerald-500/40"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-300" />
+            <span>Launch Civic Impact Intelligence Engine</span>
+          </Link>
+
           <button
             type="button"
             onClick={() => setShowCsrModal(true)}

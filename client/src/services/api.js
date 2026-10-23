@@ -96,6 +96,14 @@ export const impactService = {
   getStats: () => api.get('/impact')
 };
 
+// Civic Impact Intelligence
+export const impactIntelligenceService = {
+  getScenarios: () => api.get('/impact-intelligence/scenarios'),
+  getScenarioDetails: (id) => api.get(`/impact-intelligence/scenarios/${id}`),
+  analyzeScenario: (data) => api.post('/impact-intelligence/analyze', data),
+  getMetrics: () => api.get('/impact-intelligence/metrics')
+};
+
 // Notifications
 export const notificationService = {
   getMyNotifications: () => api.get('/notifications'),

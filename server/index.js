@@ -12,6 +12,7 @@ import eventRoutes from './routes/eventRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import impactRoutes from './routes/impactRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import intelligenceRoutes from './routes/intelligenceRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +57,7 @@ app.use('/api/issues', issueRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/impact', impactRoutes);
+app.use('/api/impact-intelligence', intelligenceRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Global Error Handler

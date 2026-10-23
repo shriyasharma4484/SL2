@@ -2,10 +2,12 @@
   "name": "sevadeep-civicconnect",
   "version": "1.0.0",
   "description": "Community Issue Reporting & Engagement Platform for Sevadeep NGO, Pune",
+  "type": "module",
   "scripts": {
     "dev": "node start-dev.js",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
+    "test:intelligence": "node test_intelligence_engine.js",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
     "seed": "cd server && node schema/initDb.js"
   },

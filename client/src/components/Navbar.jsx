@@ -19,7 +19,8 @@ import {
   Shield,
   Layers,
   ChevronDown,
-  Languages
+  Languages,
+  Sparkles
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -54,6 +55,7 @@ export default function Navbar() {
     { name: t('issues'), path: '/issues', icon: MapPin },
     { name: t('activities'), path: '/activities', icon: Calendar },
     { name: t('impact'), path: '/impact', icon: BarChart3 },
+    { name: 'Impact Intelligence', path: '/impact-intelligence', icon: Sparkles, badge: 'AI Engine' },
     { name: 'About Sevadeep', path: '/about', icon: Info },
     { name: 'Contact', path: '/contact', icon: PhoneCall },
   ];
@@ -107,13 +109,18 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                   isActive(link.path)
-                    ? 'text-emerald-800 bg-emerald-50/80 font-semibold shadow-xs'
+                    ? 'text-emerald-800 bg-emerald-50/80 font-bold shadow-xs'
                     : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
                 }`}
               >
-                {link.name}
+                <span>{link.name}</span>
+                {link.badge && (
+                  <span className="bg-emerald-100 text-emerald-800 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-wider border border-emerald-300">
+                    {link.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
